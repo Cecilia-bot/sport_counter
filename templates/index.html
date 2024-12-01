@@ -5,11 +5,11 @@
     <!-- This is the browser tab title -->
     <title>Sports counter</title>
 </head>
-<body style="color:black; font-weight: bold;" background="https://negativespace.co/wp-content/uploads/2017/06/thumb-negative-space-snowboard-snow-winter-man-johannes-waibel-1.jpg">
+<body style="color:black; font-weight: bold;" background="../imgs/snowboarder.jpg">
     <main>
         <h1>&#127938; Sports counter &#127938;</h1>
         <section>
-            <form action="">
+            <form action="/api" method="POST">
                 <fieldset>
                     <legend>Select user:</legend>
                     <!-- name="users" makes you select only one user per time-->
@@ -19,6 +19,7 @@
                 <hr class="dashed">
                 <label>Current count: </label><label>0</label>
                 <hr class="dashed">
+                <!-- <input type="text" name="test"> -->
                 <button type="submit">Add 1</button>
             </form>
         </section>
