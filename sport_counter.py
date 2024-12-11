@@ -1,8 +1,11 @@
 #backend using flask framework
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
+import os
 
 app = Flask(__name__)
+application = app
+file_path = os.path.dirname(__file__)
 
 # route == function from flask (app)
 # route defines html path and methods that will call the python function (index)
@@ -22,13 +25,13 @@ def index():
     return render_template('index.html', counter=count, user=user)
 
 def read_user(user): # needs to be adapted for both user1 and 2!!!!
-    with open("assets/data/" + user + ".txt") as user_file:
+    with open(file_path + "/static/data/" + user + ".txt") as user_file:
         return user_file.read(), user
 
 def add_one(count, user):
-    with open("assets/data/" + user + ".txt", "w") as user_file:
+    with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
         user_file.write(str(int(count) + 1))
         return int(count) + 1
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
