@@ -2,6 +2,7 @@
 
 <html lang="en">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <!-- This is the browser tab title -->
     <title>Sports counter</title>
 </head>
@@ -9,24 +10,23 @@
     <main>
         <h1>&#127938; Sports counter &#127938;</h1>
         <section>
-            <form action="/" method="POST">
+            <form>
                 <fieldset>
                     <legend>Select user:</legend>
                     <!-- name="users" makes you select only one user per time-->
                     <label><input id="User1" type="radio" name="users" value="User1" {% if user == "User1" %}checked{% endif %}>User1</label>
                     <label><input id="User2" type="radio" name="users" value="User2" {% if user == "User2" %}checked{% endif %}>User2</label>
                 </fieldset>
-                <button type="submit" value="select_user" name="action">Select</button>
                 <hr class="dashed">
-                <label>Current count: </label><label>{{ counter }}</label>
+                <label>Current count: </label><label id="counter"></label>
                 <hr class="dashed">
-                <!-- <input type="text" name="test"> -->
-                <button type="submit" value="add" name="action">Add 1</button>
+                <button value="add" name="action">Add 1</button>
             </form>
         </section>
     </main>
     <footer>
         <p>Copyright 2024 &#169; - Cecilia Barile</p>
     </footer>
+    <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
 </body>
 </html>
