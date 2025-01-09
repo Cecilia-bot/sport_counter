@@ -15,6 +15,7 @@ CORS(app)  # This allows CORS for all routes by default
 def index():
     count = 0
     user = None
+    new_user = request.form.get("new_user")
     selected_user = request.form.get("users")
     action = request.form.get("action")
     if request.method == "POST":
@@ -23,9 +24,11 @@ def index():
         if action == "add":
             current_count, user = read_user(selected_user)
             count = add_one(current_count, user)
+        if action == "create_user":
+            create_user(new_user)
         # counter=count --> counter is in html, count in python
-        return jsonify({'counter': count})
-    return render_template('index.html', counter=count, user=user)
+        return jsonify({'counter': count, 'new_user': new_user})
+    return render_template('index.html', counter=count, user=user, new_user=new_user)
 
 def read_user(user):
     with open(file_path + "/static/data/" + user + ".txt") as user_file:
@@ -35,6 +38,10 @@ def add_one(count, user):
     with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
         user_file.write(str(int(count) + 1))
         return int(count) + 1
+    
+def create_user(user):
+    with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
+        user_file.write("0")
 
 @app.after_request
 def add_headers(response):
