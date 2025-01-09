@@ -13,14 +13,13 @@
             <form>
                 <fieldset>
                     <legend>Select user:</legend>
-                    <!-- name="users" makes you select only one user per time-->
-                    <label><input id="User1" type="radio" name="users" value="User1" {% if user == "User1" %}checked{% endif %}>User1</label>
-                    <label><input id="User2" type="radio" name="users" value="User2" {% if user == "User2" %}checked{% endif %}>User2</label>
+                    <input type="text" placeholder="Enter your username" name="users">
+                    <button value="select_user" name="action" id="select_user">Enter</button>
                 </fieldset>
                 <hr class="dashed">
                 <label>Current count: </label><label id="counter"></label>
                 <hr class="dashed">
-                <button value="add" name="action">Add 1</button>
+                <button value="add" name="action" id="add_user">Add 1</button>
             </form>
         </section>
     </main>
