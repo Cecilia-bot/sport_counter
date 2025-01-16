@@ -14,25 +14,28 @@ CORS(app)  # This allows CORS for all routes by default
 @app.route('/', methods=["GET", "POST"])
 def index():
     count = 0
-    user = None
-    new_user = request.form.get("new_user")
-    selected_user = request.form.get("users")
+    user_exists = False
+    user = request.form.get("users")
+    if user:
+        selected_user = user.lower()
     action = request.form.get("action")
     if request.method == "POST":
         if action == "select_user":
-            count, user = read_user(selected_user)
+            user_exists = check_user(selected_user)
+            if user_exists:
+                count = read_user(selected_user)
         if action == "add":
-            current_count, user = read_user(selected_user)
-            count = add_one(current_count, user)
+            current_count = read_user(selected_user)
+            count = add_one(current_count, selected_user)
         if action == "create_user":
-            create_user(new_user)
+            create_user(selected_user)
         # counter=count --> counter is in html, count in python
-        return jsonify({'counter': count, 'new_user': new_user})
-    return render_template('index.html', counter=count, user=user, new_user=new_user)
+        return jsonify({'counter': count, 'user': selected_user, 'exists': user_exists})
+    return render_template('index.html')
 
 def read_user(user):
     with open(file_path + "/static/data/" + user + ".txt") as user_file:
-        return user_file.read(), user
+        return user_file.read()
 
 def add_one(count, user):
     with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
@@ -42,6 +45,11 @@ def add_one(count, user):
 def create_user(user):
     with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
         user_file.write("0")
+
+def check_user(user):
+    user_path = os.path.join(file_path, "static/data/", user + ".txt")
+    if os.path.exists(user_path):
+        return True 
 
 @app.after_request
 def add_headers(response):
