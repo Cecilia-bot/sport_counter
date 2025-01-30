@@ -7,7 +7,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 application = app
 file_path = os.path.dirname(__file__)
-resorts_path = os.path.join(file_path, "static/data/resorts.txt")
+static_data_path = os.path.join(file_path, "static/data/")
+resorts_path = os.path.join(static_data_path, "resorts.txt")
 CORS(app)  # This allows CORS for all routes by default
 
 # Remove CORS (and import) to use it on PythonAnywhere
@@ -49,20 +50,20 @@ def index():
     return render_template('index.html', resorts=resorts)
 
 def read_data(filename):
-    with open(file_path + "/static/data/" + filename + ".txt") as file:
+    with open(static_data_path + filename + ".txt") as file:
         return file.read()
 
 def add_one(count, user):
-    with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
+    with open(static_data_path + user + ".txt", "w") as user_file:
         user_file.write(str(int(count) + 1))
         return int(count) + 1
     
 def create_user(user):
-    with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
+    with open(static_data_path + user + ".txt", "w") as user_file:
         user_file.write("0")
 
 def check_user(user):
-    user_path = os.path.join(file_path, "static/data/", user + ".txt")
+    user_path = os.path.join(static_data_path, user + ".txt")
     if os.path.exists(user_path):
         return True 
 

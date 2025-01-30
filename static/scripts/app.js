@@ -54,7 +54,6 @@ $(document).ready(function () {
             type: "POST",
             data: { resorts: resort_name, action: "add_new_resort" },
             success: function (response) {
-                console.log(response.resort_exists)
                 if (response.resort_exists) {
                     alert("Ski resort " + response.resort_name + " already exists. Selecting...");
                     // Update the HTML with the new data returned by the server
