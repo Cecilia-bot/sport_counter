@@ -7,7 +7,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 application = app
 file_path = os.path.dirname(__file__)
+resorts_path = os.path.join(file_path, "static/data/resorts.txt")
 CORS(app)  # This allows CORS for all routes by default
+
+# Remove CORS (and import) to use it on PythonAnywhere
 
 # route == function from flask (app)
 # route defines html path and methods that will call the python function (index)
@@ -15,27 +18,39 @@ CORS(app)  # This allows CORS for all routes by default
 def index():
     count = 0
     user_exists = False
+    resort_exists = False
+    typed_resort = request.form.get("resorts")
     user = request.form.get("users")
+    selected_user = ""
     if user:
         selected_user = user.lower()
+    resorts = read_data("resorts").splitlines()
     action = request.form.get("action")
     if request.method == "POST":
         if action == "select_user":
             user_exists = check_user(selected_user)
             if user_exists:
-                count = read_user(selected_user)
+                count = read_data(selected_user)
         if action == "add":
-            current_count = read_user(selected_user)
+            current_count = read_data(selected_user)
             count = add_one(current_count, selected_user)
         if action == "create_user":
             create_user(selected_user)
+        if action == "add_new_resort":
+            resort_exists = check_resort(typed_resort)
+            if not resort_exists:
+                add_resort(typed_resort)
         # counter=count --> counter is in html, count in python
-        return jsonify({'counter': count, 'user': selected_user, 'exists': user_exists})
-    return render_template('index.html')
+        return jsonify({'counter': count, 
+                        'user': selected_user, 
+                        'user_exists': user_exists, 
+                        'resort_name': typed_resort, 
+                        'resort_exists': resort_exists})
+    return render_template('index.html', resorts=resorts)
 
-def read_user(user):
-    with open(file_path + "/static/data/" + user + ".txt") as user_file:
-        return user_file.read()
+def read_data(filename):
+    with open(file_path + "/static/data/" + filename + ".txt") as file:
+        return file.read()
 
 def add_one(count, user):
     with open(file_path + "/static/data/" + user + ".txt", "w") as user_file:
@@ -50,6 +65,18 @@ def check_user(user):
     user_path = os.path.join(file_path, "static/data/", user + ".txt")
     if os.path.exists(user_path):
         return True 
+
+def check_resort(ski_area):
+    resort_exists = False
+    with open(resorts_path) as file: 
+        content = file.read()
+        if ski_area in content:
+            resort_exists = True
+    return resort_exists
+
+def add_resort(ski_area):
+    with open(resorts_path, "a") as file:
+        file.write("\n" + ski_area)
 
 @app.after_request
 def add_headers(response):
