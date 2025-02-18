@@ -89,7 +89,11 @@ $(document).ready(function () {
             data: { users: username, action: "add" },
             success: function (response) { 
                 // Update the HTML with the new data returned by the server
-                $("#counter").text(response.counter);
+                if (!response.counter) {
+                    alert("You already rode today. You cannot add twice per day.");
+                } else {
+                    $("#counter").text(response.counter);
+                }
             },
             error: function () {
                 console.error("Error while sending request to the backend");

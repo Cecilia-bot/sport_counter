@@ -3,40 +3,55 @@
 <html lang="en">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- This is the browser tab title -->
     <title>Sports counter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet" 
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+            crossorigin="anonymous">
 </head>
-<body style="color:black; font-weight: bold;" background="{{ url_for('static', filename='imgs/snowboarder.jpg') }}">
-    <main>
-        <h1>&#127938; Sports counter &#127938;</h1>
-        <section>
-            <form>
-                <fieldset>
-                    <legend>Select user:</legend>
-                    <input type="text" placeholder="Enter your username" name="users">
-                    <button value="select_user" name="action" id="select_user">Enter</button>
-                </fieldset>
-                <hr class="dashed">
-                <p><label>Current user: </label><label id="current_user"></label></p>
-                <p><label>Current count: </label><label id="counter"></label></p>
-                <p><label>Total paid: </label><label id="total_paid"></label></p>
-                <p><label>You saved: </label><label id="you_saved"></label></p>
-                <input type="text" id="skiresort_name" placeholder="New ski resort" name="resorts">
-                <button value="add_new_resort" name="action" id="add_new_resort">Add new resort</button>
-                <br>
-                <select id="skiresorts">
-                    {% for resort in resorts %}
-                        <option value="{{ resort }}">{{ resort }}</option>
-                    {% endfor %}
-                </select>
-                <hr class="dashed">
-                <button value="add" name="action" id="add">Add 1</button>
-            </form>
-        </section>
-    </main>
-    <footer>
-        <p>Copyright 2024 &#169; - Cecilia Barile</p>
-    </footer>
+<body background="{{ url_for('static', filename='imgs/snowboarder.jpg') }}">
+    <div class="container-fluid d-flex flex-column min-vh-100 fw-bold col-md-8 col-lg-6 mt-3 border border-1 border-dark" style="color: black;">
+        <main> 
+            <h1 class="text-center display-md-3">&#127938; Sports counter &#127938;</h1>
+            <section>
+                <form class="row">
+                    <fieldset class="input-group mb-3">
+                        <legend>Select user:</legend>
+                        <div class="col-8 col-md-6 col-lg-5">
+                            <input type="text" placeholder="Enter your username" name="users" class="form-control ">
+                        </div>
+                        <button value="select_user" name="action" id="select_user" class="btn btn-dark">Enter</button>
+                    </fieldset>
+                    <hr class="dashed">
+                    <p><label>Current user: </label><label id="current_user"></label></p>
+                    <p><label>Current count: </label><label id="counter"></label></p>
+                    <p><label>Total paid: </label><label id="total_paid"></label></p>
+                    <p><label>You saved: </label><label id="you_saved"></label></p>
+                    <input type="text" id="skiresort_name" placeholder="New ski resort" name="resorts">
+                    <button value="add_new_resort" name="action" id="add_new_resort">Add new resort</button>
+                    <br>
+                    <select id="skiresorts">
+                        {% for resort in resorts %}
+                            <option value="{{ resort }}">{{ resort }}</option>
+                        {% endfor %}
+                    </select>
+                    <hr class="dashed">
+                    <fieldset class="input-group">
+                        <button value="add" name="action" id="add" class="btn btn-primary col-3">Add 1</button>
+                    </fieldset>
+                </form>
+            </section>
+        </main>
+        <footer class="mt-auto">
+            <p>Copyright 2024 &#169; - Cecilia Barile</p>
+        </footer>
+    </div>
     <script src="{{ url_for('static', filename='scripts/app.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+            crossorigin="anonymous">
+    </script>
 </body>
 </html>

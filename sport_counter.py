@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
 application = app
@@ -54,9 +55,15 @@ def read_data(filename):
         return file.read()
 
 def add_one(count, user):
-    with open(static_data_path + user + ".txt", "w") as user_file:
-        user_file.write(str(int(count) + 1))
-        return int(count) + 1
+    filename = os.path.join(file_path, "static/data/", user + ".txt") 
+    modification_date = datetime.fromtimestamp(os.path.getmtime(filename)).date()
+    today = datetime.today().date()
+    if today > modification_date:
+        with open(filename, "w") as user_file:
+            user_file.write(str(int(count) + 1))
+            return int(count) + 1
+    else:
+        return count == -1
     
 def create_user(user):
     with open(static_data_path + user + ".txt", "w") as user_file:
