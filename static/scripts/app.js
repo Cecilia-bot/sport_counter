@@ -1,3 +1,5 @@
+// Replace URL when hosting
+
 $(document).ready(function () {
     $("button[id='select_user']").click(function (event) {
         event.preventDefault(); // Prevent the page from refreshing
@@ -11,7 +13,7 @@ $(document).ready(function () {
             type: "POST",
             data: { users: username, action: "select_user" },
             success: function (response) {
-                if (response.exists) {
+                if (response.user_exists) {
                     // Update the HTML with the new data returned by the server
                     $("#current_user").text(response.user);
                     $("#counter").text(response.counter);
@@ -35,6 +37,40 @@ $(document).ready(function () {
                 }
                 
             },
+            error: function () {
+                console.error("Error while sending request to the backend");
+            }
+        });
+    });
+    $("button[id='add_new_resort']").click(function (event) {
+        event.preventDefault(); // Prevent the page from refreshing
+        var resort_name = $("input[name='resorts']").val(); // Get the value of the input field
+        if (!resort_name) {
+            alert("Please type a ski resort name.");
+            return;
+        }
+        $.ajax({
+            url: "http://127.0.0.1:5000/",
+            type: "POST",
+            data: { resorts: resort_name, action: "add_new_resort" },
+            success: function (response) {
+                if (response.resort_exists) {
+                    alert("Ski resort " + response.resort_name + " already exists. Selecting...");
+                    // Update the HTML with the new data returned by the server
+                    $("#skiresorts").val(response.resort_name);
+                    $("input[name='resorts']").val("")
+                } else {
+                    const createFile = confirm("Would you like to add the resort " + resort_name + "?");
+                    if (createFile) {
+                        alert("Ski resort " + response.resort_name + " successfully added!");
+                        if (!$("#skiresorts option[value='" + response.resort_name + "']").length) {
+                            $("#skiresorts").append("<option value='" + response.resort_name + "'>" + response.resort_name + "</option>");
+                        }
+                        $("#skiresorts").val(response.resort_name);
+                        $("input[name='resorts']").val("")
+                        }
+                    }
+                },
             error: function () {
                 console.error("Error while sending request to the backend");
             }

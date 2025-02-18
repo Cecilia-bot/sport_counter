@@ -27,6 +27,16 @@
                     <hr class="dashed">
                     <p><label>Current user: </label><label id="current_user"></label></p>
                     <p><label>Current count: </label><label id="counter"></label></p>
+                    <p><label>Total paid: </label><label id="total_paid"></label></p>
+                    <p><label>You saved: </label><label id="you_saved"></label></p>
+                    <input type="text" id="skiresort_name" placeholder="New ski resort" name="resorts">
+                    <button value="add_new_resort" name="action" id="add_new_resort">Add new resort</button>
+                    <br>
+                    <select id="skiresorts">
+                        {% for resort in resorts %}
+                            <option value="{{ resort }}">{{ resort }}</option>
+                        {% endfor %}
+                    </select>
                     <hr class="dashed">
                     <fieldset class="input-group">
                         <button value="add" name="action" id="add" class="btn btn-primary col-3">Add 1</button>
