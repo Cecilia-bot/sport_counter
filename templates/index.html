@@ -25,18 +25,25 @@
                         <button value="select_user" name="action" id="select_user" class="btn btn-dark">Enter</button>
                     </fieldset>
                     <hr class="dashed">
-                    <p><label>Current user: </label><label id="current_user"></label></p>
-                    <p><label>Current count: </label><label id="counter"></label></p>
-                    <p><label>Total paid: </label><label id="total_paid"></label></p>
-                    <p><label>You saved: </label><label id="you_saved"></label></p>
-                    <input type="text" id="skiresort_name" placeholder="New ski resort" name="resorts">
-                    <button value="add_new_resort" name="action" id="add_new_resort">Add new resort</button>
+                    <p><label>Current user:&nbsp;</label><label id="current_user"> </label></p>
+                    <p><label>Current count:&nbsp;</label><label id="counter"></label></p>
+                    <p><label>Total paid:&nbsp;</label><label id="total_paid"></label></p>
+                    <p><label>You saved:&nbsp;</label><label id="you_saved"></label></p>
+                    <hr class="dashed">
+                    <div class="input-group mb-3">
+                        <div class="col-8 col-md-6 col-lg-5">
+                            <input type="text" id="skiresort_name" placeholder="New ski resort" name="resorts" class="form-control">
+                        </div>
+                        <button value="add_new_resort" name="action" id="add_new_resort" class="btn btn-dark">Add resort</button>
+                    </div>
                     <br>
-                    <select id="skiresorts">
-                        {% for resort in resorts %}
-                            <option value="{{ resort }}">{{ resort }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="col-8 col-md-6 col-lg-5 mb-3 text-center">
+                        <select id="skiresorts" class="form-select">
+                            {% for resort in resorts %}
+                                <option value="{{ resort }}">{{ resort }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <hr class="dashed">
                     <fieldset class="input-group">
                         <button value="add" name="action" id="add" class="btn btn-primary col-3">Add 1</button>
