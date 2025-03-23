@@ -1,4 +1,6 @@
-// Replace URL when hosting
+// Replace URL when hosting:
+// url: "http://127.0.0.1:5000/"
+// url: "https://barilecec.pythonanywhere.com/"
 
 $(document).ready(function () {
     $("button[id='select_user']").click(function (event) {
@@ -52,8 +54,15 @@ $(document).ready(function () {
         $.ajax({
             url: "http://127.0.0.1:5000/",
             type: "POST",
-            data: { resorts: resort_name, action: "add_new_resort" },
+            contentType: "application/json",
+            data: JSON.stringify({
+                    name: resort_name,
+                    price: "10",
+                    action: "add_new_resort"
+                 }),
+                
             success: function (response) {
+                console.log(response)
                 if (response.resort_exists) {
                     alert("Ski resort " + response.resort_name + " already exists. Selecting...");
                     // Update the HTML with the new data returned by the server
