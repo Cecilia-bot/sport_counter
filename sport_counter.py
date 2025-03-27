@@ -26,8 +26,9 @@ def index():
     selected_user = ""
     if user:
         selected_user = user.lower()
-    resorts = read_data("resorts").splitlines()
-    action = request.form.get("action")
+    resorts = []
+    for resort in read_data("resorts"):
+        resorts.append(resort["resort_name"])
     if request.method == "POST":
         response = request.get_json()
         typed_resort = response["name"]
@@ -42,12 +43,13 @@ def index():
         if response["action"] == "create_user":
             create_user(selected_user)
         if response["action"] == "add_new_resort":
+            py_add_resort_to_json = response["py_add_resort_to_json"]
             resort_data = {
                 "resort_name": typed_resort,
                 "resort_price": response["price"]
             }
             resort_exists = resorts_exist(resort_data)
-            if not resort_exists:
+            if py_add_resort_to_json:
                 add_resort(resort_data)
         # counter=count --> counter is in html, count in python
         return jsonify({'counter': count, 
@@ -58,8 +60,12 @@ def index():
     return render_template('index.html', resorts=resorts)
 
 def read_data(filename):
-    with open(static_data_path + filename + ".txt") as file:
-        return file.read()
+    with open(static_data_path + filename + ".json") as file:
+        try:
+            data = json.load(file)
+        except json.JSONDecodeError:
+            data = []
+        return data
 
 def add_one(count, user):
     filename = os.path.join(file_path, "static/data/", user + ".txt") 

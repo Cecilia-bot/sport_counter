@@ -4,15 +4,15 @@
         "resort_price": "10"
     },
     {
-        "resort_name": "Schlick",
-        "resort_price": "10"
-    },
-    {
         "resort_name": "Bergeralm",
-        "resort_price": "10"
+        "resort_price": "55"
     },
     {
-        "resort_name": "Axamer L",
-        "resort_price": "10"
+        "resort_name": "Schlick 2000",
+        "resort_price": "50"
+    },
+    {
+        "resort_name": "Cervinia",
+        "resort_price": "1000"
     }
 ]

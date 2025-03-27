@@ -47,8 +47,9 @@ $(document).ready(function () {
     $("button[id='add_new_resort']").click(function (event) {
         event.preventDefault(); // Prevent the page from refreshing
         var resort_name = $("input[name='resorts']").val(); // Get the value of the input field
-        if (!resort_name) {
-            alert("Please type a ski resort name.");
+        var resort_price = $("input[name='resort_price']").val(); // Get the value of the input field
+        if (!resort_name || !resort_price) {
+            alert("Please type a ski resort name and the price.");
             return;
         }
         $.ajax({
@@ -56,11 +57,11 @@ $(document).ready(function () {
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
-                    name: resort_name,
-                    price: "10",
-                    action: "add_new_resort"
-                 }),
-                
+                name: resort_name,
+                price: resort_price,
+                action: "add_new_resort",
+                py_add_resort_to_json: false
+            }),
             success: function (response) {
                 console.log(response)
                 if (response.resort_exists) {
@@ -68,18 +69,37 @@ $(document).ready(function () {
                     // Update the HTML with the new data returned by the server
                     $("#skiresorts").val(response.resort_name);
                     $("input[name='resorts']").val("")
+                    $("input[name='resort_price']").val("")
                 } else {
-                    const createFile = confirm("Would you like to add the resort " + resort_name + "?");
-                    if (createFile) {
-                        alert("Ski resort " + response.resort_name + " successfully added!");
-                        if (!$("#skiresorts option[value='" + response.resort_name + "']").length) {
-                            $("#skiresorts").append("<option value='" + response.resort_name + "'>" + response.resort_name + "</option>");
-                        }
-                        $("#skiresorts").val(response.resort_name);
-                        $("input[name='resorts']").val("")
-                        }
+                    const js_add_resort_to_json = confirm("Would you like to add the resort " + resort_name + "?");
+                    if (js_add_resort_to_json) {
+                        $.ajax({
+                            url: "http://127.0.0.1:5000/",
+                            type: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                name: resort_name,
+                                price: resort_price,
+                                action: "add_new_resort",
+                                py_add_resort_to_json: js_add_resort_to_json
+                            }),
+                            success: function (response) {
+                                console.log(response)  
+                                alert("Ski resort " + response.resort_name + " successfully added!");
+                                if (!$("#skiresorts option[value='" + response.resort_name + "']").length) {
+                                    $("#skiresorts").append("<option value='" + response.resort_name + "'>" + response.resort_name + "</option>");
+                                }
+                                $("#skiresorts").val(response.resort_name);
+                                $("input[name='resorts']").val("")
+                                $("input[name='resort_price']").val("")
+                            },
+                            error: function () {
+                                console.error("Error while sending request to the backend");
+                            }
+                        });
                     }
-                },
+                }
+            },
             error: function () {
                 console.error("Error while sending request to the backend");
             }
