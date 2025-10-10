@@ -1,0 +1,13 @@
+html, body { height: 100%; }
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1; /* main grows to fill available space */
+}
+footer {
+    padding: 1rem 0;
+    text-align: center;
+}
