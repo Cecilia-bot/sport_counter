@@ -9,7 +9,7 @@ async function loadResorts() {
     resorts.forEach(resort => {
         const li = document.createElement("li");
         li.className = "list-group-item";
-        li.textContent = `${resort.name.charAt(0).toUpperCase()} - ${resort.price} €`;
+        li.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;
         list.appendChild(li);
     });
 }

@@ -19,15 +19,6 @@ document.getElementById("googleLoginBtn").addEventListener("click", async () => 
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
         console.log("Logged with Google;", user);
-
-        //hide login, show app
-        document.getElementById("loginDiv").style.display = "none";
-        document.getElementById("appDiv").style.display = "block";
-
-        //Get ID token for backend
-        const token = await user.getIdToken();
-        window.localStorage.setItem("firebaseToken", token);
-          
     } catch (error) {
         console.error(error);
         alert("login failed: " + error.message);

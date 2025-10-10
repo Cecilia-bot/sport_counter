@@ -47,9 +47,9 @@ async def startup():
         if count == 0:
             await db.executemany(
                 "INSERT INTO table_resorts (name, price) VALUES (?, ?)",
-                [("Stubai", 72.50),
-                ("Schlick", 49.70),
-                ("Axamer Lizum", 59.50)]
+                [("stubai", 72.50),
+                ("schlick", 49.70),
+                ("axamer lizum", 59.50)]
             )
         await db.commit()
 

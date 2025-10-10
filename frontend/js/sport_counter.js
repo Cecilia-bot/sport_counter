@@ -8,7 +8,7 @@ async function loadResorts() {
     dropdown.innerHTML = "";
     resorts.forEach(resort => {
         const option = document.createElement("option");
-        option.textContent = `${resort.name} - ${resort.price} €`;
+        option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;
         option.value = `${resort.name}`;
         dropdown.appendChild(option);
     });
@@ -21,14 +21,8 @@ async function updateState() {
         return;
     }
     document.getElementById("username").value = user.displayName;
-    
-    // firebase.auth().onAuthStateChanged(user => {
-    //     if (user) {
-    //         document.getElementById("username").value = user.displayName;
-    //     }
-    // });
 
-    const token = window.localStorage.getItem("firebaseToken");
+    const token = await user.getIdToken(/* forceRefresh */ false);
     const email = encodeURIComponent(user.email);
 
     const res = await fetch(`${API_BASE}/state/${email}`, {
@@ -51,7 +45,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         return;
     }
 
-    const token = window.localStorage.getItem("firebaseToken");
+    const token = await user.getIdToken(/* forceRefresh */ false);
     const email = encodeURIComponent(user.email);
     const resort = document.getElementById("resort").value;
 
@@ -73,14 +67,15 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
+        // show app UI
+        document.getElementById("loginDiv").style.display = "none";
+        document.getElementById("appDiv").style.display = "block";
         // user is signed in — load data and update UI
         await loadResorts();
         await updateState();
     } else {
         // user signed out — clear UI or show login prompt
-        document.getElementById("counter").innerText = "";
-        document.getElementById("spent").innerText = "";
-        document.getElementById("saved").innerText = "";
-        loadResorts();
+        document.getElementById("loginDiv").style.display = "block";
+        document.getElementById("appDiv").style.display = "none";
     }
 });
