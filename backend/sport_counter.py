@@ -140,7 +140,7 @@ async def add_resort(resort: Resort):
         try:
             await db.execute(
                 "INSERT INTO table_resorts (name, price) VALUES (?, ?)",
-                (resort.name, resort.price)
+                (resort.name.lower(), resort.price)
             )
             await db.commit()
         except Exception as e:
