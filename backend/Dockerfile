@@ -12,4 +12,4 @@ COPY sport_counter.py .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "uvicorn sportcounter:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn sport_counter:app --host 0.0.0.0 --port ${PORT:-8000}"]
