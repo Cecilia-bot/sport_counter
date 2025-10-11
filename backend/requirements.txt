@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+aiosqlite
+pydantic
+firebase_admin
+json
