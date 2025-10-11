@@ -2,6 +2,8 @@ from fastapi import FastAPI, Header, HTTPException, Depends
 from pydantic import BaseModel
 import aiosqlite
 import firebase_admin
+import os
+import json
 from firebase_admin import auth as admin_auth, credentials
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,8 +18,19 @@ app.add_middleware(
 )
 
 SKIPASS = -759 #caps lock is a constant (e.g price of Freizeitticket)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-cred = credentials.Certificate("../segreti_segretissimi/serviceAccountKey.json")
+# Read Firebase credentials from environment variable
+firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
+
+if firebase_creds:
+    cred_dict = json.loads(firebase_creds)
+    cred = credentials.Certificate(cred_dict)
+elif os.path.exists("segreti_segretissimi/serviceAccountKey.json"):
+    cred = credentials.Certificate(os.path.join(BASE_DIR, os.path.pardir, "segreti_segretissimi/serviceAccountKey.json"))
+else:
+    raise RuntimeError("FIREBASE_CREDENTIALS environment variable not set or serviceAccountKey.json not found")
+
 firebase_admin.initialize_app(cred)
 
 class AddRequest(BaseModel):
