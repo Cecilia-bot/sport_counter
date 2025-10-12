@@ -19,6 +19,7 @@ app.add_middleware(
 
 SKIPASS = -759 #caps lock is a constant (e.g price of Freizeitticket)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ADMIN_GROUP = ["barile.cec@gmail.com", "vmacarios@gmail.com"]
 
 # Read Firebase credentials from environment variable
 firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
@@ -116,7 +117,6 @@ async def add(email: str, payload: AddRequest, user=Depends(verify_token)):
             "total_saved": total_saved
         }
 
-
 #the next code chunk is for the button "enter" in HTML    
 @app.get("/state/{email}")
 async def get_state(email: str, user=Depends(verify_token)):
@@ -139,7 +139,12 @@ async def get_state(email: str, user=Depends(verify_token)):
             "total_saved": total_saved
         }
 
-#add resorts from the admin webpage    
+#add resorts from the admin webpage
+def admin_only(user=Depends(verify_token)):
+    if user.get("email") not in ADMIN_GROUP:
+        raise HTTPException(status_code=403, detail="You need admin permissions to access this page")
+    return user
+
 @app.get("/resorts")
 async def list_resorts():
     async with aiosqlite.connect("app.db") as db:
@@ -148,7 +153,7 @@ async def list_resorts():
         return [{"name": name, "price": price} for (name, price) in rows]
     
 @app.post("/resorts")
-async def add_resort(resort: Resort):
+async def add_resort(resort: Resort, user=Depends(admin_only)):   
     async with aiosqlite.connect("app.db") as db:
         try:
             await db.execute(
