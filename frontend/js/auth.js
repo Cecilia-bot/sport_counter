@@ -8,12 +8,17 @@ const firebaseConfig = {
     appId: "1:588269632153:web:c67e5a920e7dc5999d5608",
     measurementId: "G-THK83D4HXD"
   };
-  
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+
+// Initialize Firebase only if not already initialized
+if (!window.firebase.apps || window.firebase.apps.length === 0) {
+    window.firebaseApp = firebase.initializeApp(firebaseConfig);
+} else {
+    window.firebaseApp = window.firebase.apps[0];
+}
+window.auth = firebase.auth();
 
 // Handle Google login
-document.getElementById("googleLoginBtn").addEventListener("click", async () => {
+document.getElementById("googleLoginBtn")?.addEventListener("click", async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
         const result = await auth.signInWithPopup(provider);
