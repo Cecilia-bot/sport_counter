@@ -16,6 +16,13 @@ async function loadResorts() {
 }
 
 document.getElementById("addResortBtn").addEventListener("click", async () => {
+    const user = firebase.auth().currentUser;
+        if (!user) {
+        alert("Not signed in");
+        return;
+    }
+
+    const token = await user.getIdToken(/* forceRefresh */ false);
     const name = document.getElementById("new_resort_name").value.trim();
     const price = parseFloat(document.getElementById("new_resort_price").value);
     if (!name || isNaN(price)) {
@@ -25,7 +32,10 @@ document.getElementById("addResortBtn").addEventListener("click", async () => {
 
     await fetch(`${API_BASE}/resorts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` 
+         },
         body: JSON.stringify({ name, price })
     });
 
