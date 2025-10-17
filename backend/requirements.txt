@@ -4,4 +4,3 @@ aiosqlite
 pydantic
 firebase_admin
 datetime
-sqlite3
