@@ -15,6 +15,22 @@ async function loadResorts() {
     });
 }
 
+document.getElementById("download-db").addEventListener("click", async () => {
+    const user = firebase.auth().currentUser;
+        if (!user) {
+        alert("Not signed in");
+        return;
+    }
+
+    const token = await user.getIdToken(/* forceRefresh */ false);
+
+    await fetch(`${API_BASE}/admin/download-db`, {
+        headers: { 
+            "Authorization": `Bearer ${token}`
+         }
+    });
+});
+
 document.getElementById("addResortBtn").addEventListener("click", async () => {
     const user = firebase.auth().currentUser;
         if (!user) {
