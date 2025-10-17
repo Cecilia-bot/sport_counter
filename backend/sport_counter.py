@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import aiosqlite
 import firebase_admin
 import os
 import json
+from datetime import datetime
 from firebase_admin import auth as admin_auth, credentials
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,6 +22,10 @@ app.add_middleware(
 SKIPASS = -759 #caps lock is a constant (e.g price of Freizeitticket)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ADMIN_GROUP = ["barile.cec@gmail.com", "vmacarios@gmail.com"]
+DB_PATH = os.path.join(os.path.dirname(__file__), "db", "app.db")
+BACKUP_DIR = os.path.join(os.path.dirname(__file__), "db", "backups")
+
+os.makedirs(BACKUP_DIR, exist_ok=True)  # ensure folder exists
 
 # Read Firebase credentials from environment variable
 firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
@@ -27,8 +33,8 @@ firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
 if firebase_creds:
     cred_dict = json.loads(firebase_creds)
     cred = credentials.Certificate(cred_dict)
-elif os.path.exists("segreti_segretissimi/serviceAccountKey.json"):
-    cred = credentials.Certificate(os.path.join(BASE_DIR, os.path.pardir, "segreti_segretissimi/serviceAccountKey.json"))
+elif os.path.exists(os.path.join(BASE_DIR, "serviceAccountKey.json")):
+    cred = credentials.Certificate(os.path.join(BASE_DIR, "serviceAccountKey.json"))
 else:
     raise RuntimeError("FIREBASE_CREDENTIALS environment variable not set or serviceAccountKey.json not found")
 
@@ -165,5 +171,44 @@ async def add_resort(resort: Resort, user=Depends(admin_only)):
             return{"error": str(e)}
     return {"message": "Resort added successfully!"}
 
+@app.get("/admin/download-db")
+async def download_db(user=Depends(admin_only)):
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=404, detail="Database not found")
 
+    # --- Create safe backup ---
+    backup_name = f"backup_app_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+    backup_path = os.path.join(BACKUP_DIR, backup_name)
+
+    try:
+        src = aiosqlite.connect(DB_PATH)
+        dest = aiosqlite.connect(backup_path)
+        with dest:
+            src.backup(dest)
+        src.close()
+        dest.close()
+        print(f"✅ Backup created: {backup_name}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Backup failed: {str(e)}")
+
+    # --- Return backup file for download ---
+    response = FileResponse(
+        backup_path,
+        media_type="application/octet-stream",
+        filename=backup_name
+    )
+
+    # Cleanup old backups
+    # (Keep only latest 5)
+    try:
+        backups = sorted(
+            [file for file in os.listdir(BACKUP_DIR) if file.startswith("backup_app_")],
+            reverse=True
+        )
+        for old in backups[5:]:
+            os.remove(os.path.join(BACKUP_DIR, old))
+    except Exception as e:
+        print("Cleanup failed:", e)
+
+    return response
     
