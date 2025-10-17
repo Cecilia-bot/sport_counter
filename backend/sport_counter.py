@@ -2,6 +2,7 @@ from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import aiosqlite
+import sqlite3
 import firebase_admin
 import os
 import json
@@ -181,8 +182,8 @@ async def download_db(user=Depends(admin_only)):
     backup_path = os.path.join(BACKUP_DIR, backup_name)
 
     try:
-        src = aiosqlite.connect(DB_PATH)
-        dest = aiosqlite.connect(backup_path)
+        src = sqlite3.connect(DB_PATH)
+        dest = sqlite3.connect(backup_path)
         with dest:
             src.backup(dest)
         src.close()
