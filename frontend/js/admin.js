@@ -24,11 +24,39 @@ document.getElementById("download-db").addEventListener("click", async () => {
 
     const token = await user.getIdToken(/* forceRefresh */ false);
 
-    await fetch(`${API_BASE}/admin/download-db`, {
+    const response = await fetch(`${API_BASE}/admin/download-db`, {
         headers: { 
             "Authorization": `Bearer ${token}`
          }
     });
+
+    if (!response.ok) {
+        const msg = await response.text();
+        alert(`Download failed: ${response.status} ${msg}`);
+        return;
+    }
+
+    // Convert response into a blob (binary data)
+    const blob = await response.blob();
+
+    // Create a temporary object URL for the blob
+    const url = window.URL.createObjectURL(blob);
+
+    // Create an <a> element to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+
+    // Try to extract filename from Content-Disposition header
+    const disposition = response.headers.get("Content-Disposition");
+    const match = disposition && disposition.match(/filename="?(.+)"?/);
+    a.download = match ? match[1] : "backup.db";
+
+    document.body.appendChild(a);
+    a.click(); // trigger the download
+    a.remove();
+
+    // Clean up the blob URL after download
+    window.URL.revokeObjectURL(url);
 });
 
 document.getElementById("addResortBtn").addEventListener("click", async () => {
