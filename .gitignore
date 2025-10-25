@@ -1,3 +1,4 @@
 *pycache*
 app.db
-segreti_segretissimi
+serviceAccountKey.json
+.vscode
