@@ -46,20 +46,20 @@ document.getElementById("download-db").addEventListener("click", async () => {
     const a = document.createElement("a");
     a.href = url;
 
-    // Try to extract filename from Content-Disposition header
+    // Try to extract filename from Content-Disposition header or use current date
     const date = new Date();
-    const formattedDate = new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    }).format(date)
-    .replace(/[^\d]/g, ''); // remove non-digits
-    const currentDate = formattedDate.slice(0, 8) + "_" + formattedDate.slice(8);
-    a.download = "backup_app_" + currentDate + ".db"
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const currentDate = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const backupFilename = "backup_app_" + currentDate + ".db"
+    
+    const disposition = response.headers.get("Content-Disposition");
+    const match = disposition && disposition.match(/filename="([^"]+)"/);
+    a.download = match ? match[1] : backupFilename;
 
     document.body.appendChild(a);
     a.click(); // trigger the download
