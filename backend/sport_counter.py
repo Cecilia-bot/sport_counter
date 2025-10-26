@@ -199,7 +199,8 @@ async def download_db(user=Depends(admin_only)):
     response = FileResponse(
         backup_path,
         media_type="application/octet-stream",
-        filename=backup_name
+        filename=backup_name,
+        headers={"Access-Control-Expose-Headers": "Content-Disposition"}
     )
 
     # Cleanup old backups
