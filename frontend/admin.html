@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snow counter - ADMIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -11,29 +12,32 @@
 </head>
 
 <body class="p-4">
-
     <div class="container">
-        <h2 class="mb-4">Snow counter - Control panel</h2>
-        <div class="mb-3">
+        <div class="text-center">
+            <h2><b>Snow counter</b></h2>
+            <h3 class="mb-4">Control panel</h3>
+        </div>
 
+        <div class="mb-3">
             <label class="form-label">Resorts:</label>
             <ul id="resortList" class="list-group"></ul>
         </div>
+
         <div class="mb-3">
             <label class="form-label">New Resort:</label>
             <input id="new_resort_name" type="text" class="form-control" placeholder="Enter new resort name">
         </div>
-
+        
         <div class="mb-3">
             <label class="form-label">New Resort price:</label>
             <input id="new_resort_price" type="text" class="form-control" placeholder="Enter new resort price">
         </div>
-
+        
         <button id="addResortBtn" class="btn btn-primary mb-3">Add</button>
-
+        
         <button id="download-db" class="btn btn-primary mb-3">Backup</button>
     </div>
-
+    
     <script src="js/auth.js"></script>
     <script src="js/admin.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
