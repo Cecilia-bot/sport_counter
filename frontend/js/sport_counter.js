@@ -15,6 +15,18 @@ async function loadResorts() {
     });
 }
 
+async function updateFields(data) {
+    document.getElementById("counter").innerText = data.counter;
+    document.getElementById("spent").innerText = Number(data.total_spent).toFixed(2);
+    if (data.total_saved > 0) {
+        saved_string = "😎 You are saving: ";
+    } else {
+        saved_string = "😔 Still recovering... "
+    }
+    document.getElementById("saved_string").innerText = saved_string;
+    document.getElementById("saved").innerText = Number(data.total_saved).toFixed(2);
+}
+
 async function updateState() {
     const user = firebase.auth().currentUser;
     if (!user) {
@@ -34,9 +46,7 @@ async function updateState() {
     });
 
     const data = await res.json();
-    document.getElementById("counter").innerText = data.counter;
-    document.getElementById("spent").innerText = Number(data.total_spent).toFixed(2);
-    document.getElementById("saved").innerText = Number(data.total_saved).toFixed(2);
+    updateFields(data);
 } 
 
 document.getElementById("addBtn").addEventListener("click", async () => {
@@ -60,9 +70,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     });
     
     const data = await res.json();
-    document.getElementById("counter").innerText = data.counter;
-    document.getElementById("spent").innerText = Number(data.total_spent).toFixed(2);
-    document.getElementById("saved").innerText = Number(data.total_saved).toFixed(2);
+    updateFields(data);
 });
 
 
