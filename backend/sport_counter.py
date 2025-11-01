@@ -58,7 +58,8 @@ async def startup():
         CREATE TABLE IF NOT EXISTS table_users (
             email TEXT PRIMARY KEY,
             counter INTEGER DEFAULT 0,
-            total_spent REAL DEFAULT 0.0
+            total_spent REAL DEFAULT 0.0,
+            is_admin INTEGER DEFAULT 0
         )""")
         await db.execute("""
         CREATE TABLE IF NOT EXISTS table_resorts (
@@ -106,50 +107,53 @@ async def add(email: str, payload: AddRequest, user=Depends(verify_token)):
         #check if user exists, otherwise create it
         cursor = await db.execute("SELECT counter, total_spent FROM table_users WHERE email = ?", (email,))
         user = await cursor.fetchone()
+        is_admin = email in ADMIN_GROUP
 
         if user:
             counter, total_spent = user
             counter += 1
             total_spent += price
-            await db.execute("UPDATE table_users SET counter=?, total_spent=? WHERE email=?",
-                             (counter, total_spent, email))
+            await db.execute("UPDATE table_users SET counter=?, total_spent=?, is_admin=? WHERE email=?",
+                             (counter, total_spent, is_admin, email))
         else:
             counter = 1
             total_spent = price
-            await db.execute("INSERT INTO table_users (email, counter, total_spent) VALUES (?, ?, ?)",
-                             (email, counter, total_spent))
+            await db.execute("INSERT INTO table_users (email, counter, total_spent, is_admin) VALUES (?, ?, ?, ?)",
+                             (email, counter, total_spent, is_admin))
         await db.commit()
 
         total_saved = SKIPASS + total_spent
         return {
             "counter": counter,
             "total_spent": total_spent,
-            "total_saved": total_saved
+            "total_saved": total_saved,
+            "is_admin": is_admin
         }
 
-#the next code chunk is for the button "enter" in HTML    
+#the next code chunk is to display the data from the user
 @app.get("/state/{email}")
 async def get_state(email: str, user=Depends(verify_token)):
     email  = email.lower()
     if user["email"].lower() != email:
         raise HTTPException(status_code=403, detail="Access denied")
     async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("SELECT counter, total_spent FROM table_users WHERE email =?", (email,))
+        cursor = await db.execute("SELECT counter, total_spent, is_admin FROM table_users WHERE email =?", (email,))
         user = await cursor.fetchone()
-                                  
+        is_admin_fallback = email in ADMIN_GROUP
+
         if user is None:
-            return {"counter": 0, "total_spent": 0, "total_saved": SKIPASS}
-        
-        counter, total_spent = user
+            return {"counter": 0, "total_spent": 0, "is_admin": is_admin_fallback, "total_saved": SKIPASS}
+
+        counter, total_spent, is_admin = user
         total_saved = SKIPASS + total_spent
 
         return {
             "counter": counter,
             "total_spent": total_spent,
-            "total_saved": total_saved
+            "total_saved": total_saved,
+            "is_admin": is_admin
         }
 
-#add resorts from the admin webpage
 def admin_only(user=Depends(verify_token)):
     if user.get("email") not in ADMIN_GROUP:
         raise HTTPException(status_code=403, detail="You need admin permissions to access this page")
@@ -158,7 +162,7 @@ def admin_only(user=Depends(verify_token)):
 @app.get("/resorts")
 async def list_resorts():
     async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("SELECT name, price FROM table_resorts")
+        cursor = await db.execute("SELECT name, price FROM table_resorts ORDER BY name ASC")
         rows = await cursor.fetchall()
         return [{"name": name, "price": price} for (name, price) in rows]
     
