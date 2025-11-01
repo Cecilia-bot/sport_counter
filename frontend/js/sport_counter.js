@@ -25,6 +25,9 @@ async function updateFields(data) {
     }
     document.getElementById("saved_string").innerText = saved_string;
     document.getElementById("saved").innerText = Number(data.total_saved).toFixed(2);
+    if (data.is_admin) {
+        document.getElementById("goToAdmin").classList.remove(["hide"]);
+    }
 }
 
 async function updateState() {

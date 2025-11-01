@@ -34,12 +34,19 @@
         <button id="addBtn" class="btn btn-primary mb-3">Add</button>
 
         <div class="card p-3">
-            <p><strong>Went to slopes:</strong> <span id="counter">0</span> times</p>
+            <p><strong>Went to slopes:</strong> <span id="counter">0</span> time(s)</p>
             <p><strong>Costs without Freizeitticket:</strong> <span id="spent">0</span> €</p>
             <p><strong><span id="saved_string"></span></strong> <span id="saved">0</span> €</p>
         </div>
+
+        <div class="d-flex justify-content-end p-3 hide" id="goToAdmin">
+            <a href="admin.html" class="btn btn-outline-secondary admin btn">
+                Go to Admin Page</a>
+        </div>     
+
     </div>
 </main>
+
 <script src="js/auth.js"></script>
 <script src="js/sport_counter.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

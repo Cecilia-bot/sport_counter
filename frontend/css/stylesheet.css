@@ -11,3 +11,12 @@ footer {
     padding: 1rem 0;
     text-align: center;
 }
+.admin-btn {
+    position: fixed;   /* force the position to override Bootstrap */
+    bottom: 20px;      
+    right: 20px;       
+    z-index: 1050;                /* make sure it’s on top of Bootstrap modals/cards */
+}
+.hide {
+    display: none !important;
+}
