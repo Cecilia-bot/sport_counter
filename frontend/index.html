@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snow counter</title>
+    <title>Snow Counter</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="css/stylesheet.css" rel="stylesheet">
@@ -11,15 +11,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 
-<body class="p-4">
-<main>
+<body class="p-2">
+<main class="mt-4">
     <div class="text-center" id="loginDiv" style="display:none">
-        <label class="form-label">Login with Google</label>
         <button id="googleLoginBtn" class="btn btn-danger">Sign in with Google</button>
+        <p>By signing in, you agree to our <a href="legal/privacy.html">Privacy Policy</a>.</p>
     </div>
 
     <div class="container" id="appDiv" style="display:none">
-        <h2 class="mb-4; text-center">&#127938; Snow counter &#127938;</h2>
+        <h1 class="mb-4; text-center">&#127938;Snow Counter&#127938;</h1>
 
         <div class="my-3">
             <label class="form-label">Username:</label>
@@ -33,16 +33,15 @@
 
         <button id="addBtn" class="btn btn-primary mb-3">Add</button>
 
-        <div class="card p-3">
+        <div class="card shadow p-3">
             <p><strong>Went to slopes:</strong> <span id="counter">0</span> time(s)</p>
             <p><strong>Costs without Freizeitticket:</strong> <span id="spent">0</span> €</p>
             <p><strong><span id="saved_string"></span></strong> <span id="saved">0</span> €</p>
         </div>
 
         <div class="d-flex justify-content-end p-3 hide" id="goToAdmin">
-            <a href="admin.html" class="btn btn-outline-secondary admin btn">
-                Go to Admin Page</a>
-        </div>     
+            <a href="admin.html" class="btn btn-outline-secondary admin btn">Go to Admin Page</a>
+        </div>
 
     </div>
 </main>
@@ -53,8 +52,11 @@
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 
-<footer class="mt-auto">
-    <p>Copyright 2025 &#169;<br>Cecilia Barile & Victor Macarios</p>
+<hr>
+
+<footer class="container d-flex justify-content-between align-items-center">
+  <p class="text-muted mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Sport Counter</p>
+  <a class="text-muted text-decoration-none" href="legal/privacy.html">Privacy Policy</a>
 </footer>
 
 </html>
