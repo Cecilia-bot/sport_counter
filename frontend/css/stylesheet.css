@@ -1,22 +1,99 @@
 html, body { height: 100%; }
+
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: #f8f9fa;
+    color: #212529;
+    font-family: 'Segoe UI', Roboto, sans-serif;
 }
+
 main {
-    flex: 1; /* main grows to fill available space */
+    flex: 1;                    /* main grows to fill available space */
 }
+
 footer {
-    padding: 1rem 0;
-    text-align: center;
+    padding: 0.5rem 0;
 }
+
 .admin-btn {
-    position: fixed;   /* force the position to override Bootstrap */
-    bottom: 20px;      
-    right: 20px;       
-    z-index: 1050;                /* make sure it’s on top of Bootstrap modals/cards */
+    position: fixed;            /* force the position to override Bootstrap */
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;              /* make sure it’s on top of Bootstrap modals/cards */
 }
+
 .hide {
     display: none !important;
+}
+
+h1, h2, h3 {
+    color: #05276e;           /* dark blue tone */
+    font-weight: 700;
+}
+
+h1 {
+    padding-bottom: 0.5rem;
+    font-size: 2rem;
+}
+
+h2 {
+    border-bottom: 2px solid #062e85;
+    padding-bottom: 0.3rem;
+    margin-top: 1rem;
+    font-size: 1.5rem;
+}
+
+h3 {
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+}
+
+hr {
+    border-top: 1px solid gray;
+}
+
+.card {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+a {
+    color: #0d1b2a;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #53667a;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline !important;
+}
+
+#scrollTopBtn {
+    width: 50px;
+    height: 50px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+#scrollTopBtn:hover {
+    color: white;
+    background-color: #05276e;
+}
+
+.back-arrow {
+    color: #05276e;
+    font-size: 1.3rem;
+    top: 50%;                       /* vertically center */
+    transform: translateY(-50%);    /* correct offset */
+    padding: 0.5rem 0.5rem 0.5rem 0rem;
 }
