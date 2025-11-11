@@ -3,4 +3,3 @@ uvicorn
 aiosqlite
 pydantic
 firebase_admin
-datetime
