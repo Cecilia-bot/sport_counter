@@ -56,15 +56,30 @@ async def startup():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
         CREATE TABLE IF NOT EXISTS table_users (
-            email TEXT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
             counter INTEGER DEFAULT 0,
             total_spent REAL DEFAULT 0.0,
-            is_admin INTEGER DEFAULT 0
+            is_admin INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            last_login TEXT
         )""")
         await db.execute("""
         CREATE TABLE IF NOT EXISTS table_resorts (
-            name TEXT PRIMARY KEY,
-            price REAL NOT NULL
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL, 
+            price REAL NOT NULL,
+            updated_at TEXT DEFAULT (datetime('now'))
+        )""")
+        await db.execute("""
+        CREATE TABLE IF NOT EXISTS table_user_resorts_visits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            resort_id INTEGER NOT NULL,
+            visit_date TEXT DEFAULT (datetime('now')),
+            price_paid REAL NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES table_users(id) ON DELETE CASCADE,
+            FOREIGN KEY (resort_id) REFERENCES table_resorts(id) ON DELETE CASCADE
         )""")
 
         cursor = await db.execute("SELECT COUNT(*) FROM table_resorts")
@@ -74,7 +89,7 @@ async def startup():
                 "INSERT INTO table_resorts (name, price) VALUES (?, ?)",
                 [("stubai", 72.50),
                 ("schlick", 49.70),
-                ("axamer lizum", 59.50)]
+                ("axamer lizum", 56.50)]
             )
         await db.commit()
 
@@ -95,31 +110,36 @@ async def add(email: str, payload: AddRequest, user=Depends(verify_token)):
     if user["email"].lower() != email:
         raise HTTPException(status_code=403, detail="Access denied")
     async with aiosqlite.connect(DB_PATH) as db:
-
         #check if resort exists, if yes, get the price
-        cursor = await db.execute("SELECT price FROM table_resorts WHERE name = ?", (resort_name,))
+        cursor = await db.execute("SELECT id, price FROM table_resorts WHERE name = ?", (resort_name,))
         row = await cursor.fetchone()
 
         if not row:
             return {"error": "Invalid resort"}
-        price = row[0]
+        resort_id, price = row
 
         #check if user exists, otherwise create it
-        cursor = await db.execute("SELECT counter, total_spent FROM table_users WHERE email = ?", (email,))
+        cursor = await db.execute("SELECT id, counter, total_spent FROM table_users WHERE email = ?", (email,))
         user = await cursor.fetchone()
         is_admin = email in ADMIN_GROUP
 
         if user:
-            counter, total_spent = user
+            user_id, counter, total_spent = user
             counter += 1
             total_spent += price
-            await db.execute("UPDATE table_users SET counter=?, total_spent=?, is_admin=? WHERE email=?",
-                             (counter, total_spent, is_admin, email))
+            await db.execute("UPDATE table_users SET email=?, counter=?, total_spent=?, is_admin=?, last_login=datetime('now') WHERE id=?",
+                             (email, counter, total_spent, is_admin, user_id))
         else:
             counter = 1
             total_spent = price
-            await db.execute("INSERT INTO table_users (email, counter, total_spent, is_admin) VALUES (?, ?, ?, ?)",
+            await db.execute("INSERT INTO table_users (email, counter, total_spent, is_admin, last_login) VALUES (?, ?, ?, ?, datetime('now'))",
                              (email, counter, total_spent, is_admin))
+            user_id = cursor.lastrowid
+
+        # create visit
+        await db.execute("INSERT INTO table_user_resorts_visits (user_id, resort_id, visit_date, price_paid) VALUES (?, ?, datetime('now'), ?)", 
+                         (user_id, resort_id, price))
+        
         await db.commit()
 
         total_saved = SKIPASS + total_spent
@@ -154,6 +174,35 @@ async def get_state(email: str, user=Depends(verify_token)):
             "is_admin": is_admin
         }
 
+@app.get("/state/{email}/visits")
+async def get_visits(email: str, user=Depends(verify_token)):
+    email = email.lower()
+    if user["email"].lower() != email:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("""
+            SELECT
+                tbl_visit.visit_date,
+                table_resorts.name as resort_name,
+                tbl_visit.price_paid
+            FROM table_user_resorts_visits tbl_visit
+            JOIN table_users ON tbl_visit.user_id = table_users.id
+            JOIN table_resorts ON tbl_visit.resort_id = table_resorts.id
+            WHERE table_users.email = ?
+            ORDER BY tbl_visit.visit_date DESC
+        """, (email,))
+
+        visits = await cursor.fetchall()
+        return [
+            {
+                "visit_date": visit_date,
+                "resort": resort_name,
+                "price_paid": price_paid
+            }
+            for (visit_date, resort_name, price_paid) in visits
+        ]
+
 def admin_only(user=Depends(verify_token)):
     if user.get("email") not in ADMIN_GROUP:
         raise HTTPException(status_code=403, detail="You need admin permissions to access this page")
@@ -162,9 +211,17 @@ def admin_only(user=Depends(verify_token)):
 @app.get("/resorts")
 async def list_resorts():
     async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("SELECT name, price FROM table_resorts ORDER BY name ASC")
+        cursor = await db.execute("SELECT id, name, price, updated_at FROM table_resorts ORDER BY name ASC")
         rows = await cursor.fetchall()
-        return [{"name": name, "price": price} for (name, price) in rows]
+        return [
+            {
+                "id": id,
+                "name": name, 
+                "price": price, 
+                "updated_at": updated_at
+            } 
+            for (id, name, price, updated_at) in rows
+        ]
     
 @app.post("/resorts")
 async def add_resort(resort: Resort, user=Depends(admin_only)):   
@@ -175,9 +232,14 @@ async def add_resort(resort: Resort, user=Depends(admin_only)):
                 (resort.name.lower(), resort.price)
             )
             await db.commit()
+            cursor = await db.execute(
+                "SELECT id FROM table_resorts WHERE name = ?",
+                (resort.name.lower(),)
+            )
+            (resort_id,) = await cursor.fetchone()
+            return {"id": resort_id, "message": "Resort added successfully!"}
         except Exception as e:
             return{"error": str(e)}
-    return {"message": "Resort added successfully!"}
 
 @app.get("/admin/download-db")
 async def download_db(user=Depends(admin_only)):
