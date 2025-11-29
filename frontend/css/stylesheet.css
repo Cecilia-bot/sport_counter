@@ -28,24 +28,24 @@ footer {
     display: none !important;
 }
 
-h1, h2, h3 {
+.sc-title, .sc-subtitle, h3 {
     color: #05276e;           /* dark blue tone */
     font-weight: 700;
 }
 
-h1 {
+.sc-title {
     padding-bottom: 0.5rem;
     font-size: 2rem;
 }
 
-h2 {
+.sc-subtitle {
     border-bottom: 2px solid #062e85;
     padding-bottom: 0.3rem;
     margin-top: 1rem;
     font-size: 1.5rem;
 }
 
-h3 {
+.container h3 {
     margin-top: 1.5rem;
     font-size: 1.2rem;
 }
