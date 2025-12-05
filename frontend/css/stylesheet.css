@@ -1,4 +1,9 @@
-html, body { height: 100%; }
+html, body { 
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     display: flex;
@@ -7,6 +12,7 @@ body {
     background-color: #f8f9fa;
     color: #212529;
     font-family: 'Segoe UI', Roboto, sans-serif;
+    position: relative;
 }
 
 main {
@@ -96,4 +102,45 @@ footer a:hover {
     top: 50%;                       /* vertically center */
     transform: translateY(-50%);    /* correct offset */
     padding: 0.5rem 0.5rem 0.5rem 0rem;
+}
+
+/* Floating button */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+/* Slide-up panel */
+.slide-panel {
+    position: fixed;
+    bottom: -650px; /* hidden by default, positioned below viewport */
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 650px;
+    background: white;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+    padding: 20px;
+    transition: bottom 0.35s ease;
+    z-index: 999;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* when active, slide up */
+.slide-panel.active {
+    bottom: 0;
 }

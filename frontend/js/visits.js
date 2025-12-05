@@ -9,7 +9,7 @@ function waitForAuth() {
     });
 }
 
-async function loadVisits() {
+export async function loadVisits() {
     const user = await waitForAuth();   // <-- ⭐ VERY important
     if (!user) {
         alert("Not signed in");
@@ -103,5 +103,3 @@ function renderResortAccordion(visits) {
         container.insertAdjacentHTML("beforeend", html);
     });
 }
-
-loadVisits();
