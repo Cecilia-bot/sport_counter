@@ -1,5 +1,5 @@
-const API_BASE = "http://127.0.0.1:8000";
-// const API_BASE = "https://sportcounter-backend.up.railway.app";
+// const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 function waitForAuth() {
     return new Promise(resolve => {
@@ -26,14 +26,7 @@ async function loadVisits() {
     });
 
     const visits = await res.json();
-    const list = document.getElementById("visitsList");
-    list.innerHTML = "";
-    visits.forEach(visit => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = `${visit.visit_date} | ${visit.resort} | ${visit.price_paid}`;
-        list.appendChild(li);
-    });
+    renderResortAccordion(visits);
 }
 
 function groupByResort(visits) {
@@ -70,8 +63,8 @@ function renderResortAccordion(visits) {
         // Build the table rows
         const rows = visitsList.map(v => `
             <tr>
-                <td>${v.date}</td>
-                <td>${v.price} €</td>
+                <td>${v.visit_date}</td>
+                <td>${v.price_paid} €</td>
             </tr>
         `).join("");
 
@@ -81,7 +74,7 @@ function renderResortAccordion(visits) {
                 <button class="accordion-button collapsed" type="button"
                     data-bs-toggle="collapse" data-bs-target="#${collapseId}"
                     aria-expanded="false" aria-controls="${collapseId}">
-                    ${resort} — <strong>${totalPrice} € total</strong>
+                    <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)}</strong> - ${visitsList.length} time(s) - ${totalPrice} € total
                 </button>
             </h2>
 
