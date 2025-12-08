@@ -17,8 +17,9 @@ openBtn.addEventListener("click", () => {
 // Pointer-based drag support: supports touch and mouse (desktop dragging)
 let startY = 0;
 let currentY = 0;
-let touching = false;
+let touching = false;       // true when we've started a real drag
 let activePointerId = null;
+let pointerDown = false;    // true between pointerdown and pointerup
 
 panel.addEventListener('pointerdown', (e) => {
     // only handle primary pointers (mouse left button / single touch)
@@ -27,33 +28,49 @@ panel.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && window.innerWidth < 900) return;
     startY = e.clientY;
     currentY = startY;
-    touching = true;
+    pointerDown = true;
     activePointerId = e.pointerId;
-    try {
-        panel.setPointerCapture(activePointerId);
-    } catch (err) {
-        // ignore if not supported
-    }
-    // temporarily disable transition for direct follow effect
-    panel.style.transition = 'none';
+    // do NOT disable transitions yet; wait until user actually moves enough to be considered dragging
 });
 
 panel.addEventListener('pointermove', (e) => {
-    if (!touching || e.pointerId !== activePointerId) return;
+    if (!pointerDown || e.pointerId !== activePointerId) return;
     currentY = e.clientY;
     const delta = currentY - startY;
     // only respond to vertical moves beyond a small threshold
     if (Math.abs(delta) > 6) {
+        // when first crossing the threshold, enter dragging mode and disable transition
+        if (!touching) {
+            touching = true;
+            panel.style.transition = 'none';
+            // only capture the pointer when we start dragging so clicks still reach inner elements
+            try {
+                panel.setPointerCapture(activePointerId);
+            } catch (err) {
+                // ignore if not supported
+            }
+        }
         // apply a translate while dragging (delta positive moves it down)
         panel.style.transform = `translateY(${Math.max(0, delta)}px)`;
     }
 });
 
 function finishPointerDrag(e) {
-    if (!touching) return;
-    touching = false;
+    // clear pointerDown flag
+    pointerDown = false;
     const delta = currentY - startY;
-    // restore transition
+    // if we never entered dragging mode, just ensure we clear any partial inline styles
+    if (!touching) {
+        panel.style.transition = '';
+        panel.style.transform = '';
+        try {
+            if (activePointerId != null) panel.releasePointerCapture(activePointerId);
+        } catch (err) {}
+        activePointerId = null;
+        return;
+    }
+    touching = false;
+    // restore transition (we'll animate from current inline transform to the target)
     panel.style.transition = '';
     // release pointer capture if we set it
     try {
