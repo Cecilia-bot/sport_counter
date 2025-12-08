@@ -1,4 +1,9 @@
-html, body { height: 100%; }
+html, body { 
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     display: flex;
@@ -7,6 +12,7 @@ body {
     background-color: #f8f9fa;
     color: #212529;
     font-family: 'Segoe UI', Roboto, sans-serif;
+    position: relative;
 }
 
 main {
@@ -28,24 +34,24 @@ footer {
     display: none !important;
 }
 
-h1, h2, h3 {
+.sc-title, .sc-subtitle, h3 {
     color: #05276e;           /* dark blue tone */
     font-weight: 700;
 }
 
-h1 {
+.sc-title {
     padding-bottom: 0.5rem;
     font-size: 2rem;
 }
 
-h2 {
+.sc-subtitle {
     border-bottom: 2px solid #062e85;
     padding-bottom: 0.3rem;
     margin-top: 1rem;
     font-size: 1.5rem;
 }
 
-h3 {
+.container h3 {
     margin-top: 1.5rem;
     font-size: 1.2rem;
 }
@@ -96,4 +102,84 @@ footer a:hover {
     top: 50%;                       /* vertically center */
     transform: translateY(-50%);    /* correct offset */
     padding: 0.5rem 0.5rem 0.5rem 0rem;
+}
+
+/* Floating button */
+.floating-btn {
+    position: fixed;
+    bottom: 71px;
+    right: 20px;
+    background: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 21px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 1200;
+    display: none; /* hidden by default on small screens; shown on desktop via media query */
+}
+
+/* Slide-up panel: use transform for smoother animation and viewport-relative sizing */
+.slide-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* cover ~95% of viewport so a small top area remains visible */
+    height: 95vh;
+    max-height: 95vh;
+    background: white;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -8px 20px rgba(0,0,0,0.18);
+    padding: 18px 18px 24px 18px;
+    transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
+    z-index: 1100;
+    overflow-y: auto;
+    box-sizing: border-box;
+    /* start hidden by translating it fully down */
+    transform: translateY(100%);
+    -webkit-transform: translateY(100%);
+    touch-action: none; /* allow custom touch handling */
+}
+
+/* add a small visible handle so users know they can swipe */
+.slide-panel::before {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 6px;
+    margin: 6px auto 12px auto;
+}
+
+/* when active, bring it into view */
+.slide-panel.active {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+}
+
+/* Desktop: slightly smaller overlay so title remains visible */
+/* Show floating button only on larger (desktop) viewports */
+@media (min-width: 900px) {
+    .floating-btn {
+        display: block;
+    }
+    /* on large screens, still use 95% of viewport height to match mobile behavior */
+    .slide-panel {
+        height: 95vh;
+        max-height: 95vh;
+    }
+}
+
+/* Small phones: make sure it still leaves a tiny visible gap */
+@media (max-height: 480px) {
+    .slide-panel {
+        height: 94vh;
+        max-height: 94vh;
+    }
 }
