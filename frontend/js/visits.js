@@ -74,7 +74,7 @@ function renderResortAccordion(visits) {
                 <button class="accordion-button collapsed" type="button"
                     data-bs-toggle="collapse" data-bs-target="#${collapseId}"
                     aria-expanded="false" aria-controls="${collapseId}">
-                    <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)}</strong> - ${visitsList.length} time(s) - ${totalPrice} € total
+                    <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)} </strong>&nbsp;${visitsList.length} time(s) - ${totalPrice} €
                 </button>
             </h2>
 
