@@ -51,6 +51,10 @@ class Resort(BaseModel):
     name: str
     price: float
 
+class EditVisitRequest(BaseModel):
+    visit_date: str
+    price_paid: float
+
 @app.on_event("startup")
 async def startup():
     async with aiosqlite.connect(DB_PATH) as db:
@@ -183,6 +187,7 @@ async def get_visits(email: str, user=Depends(verify_token)):
     async with aiosqlite.connect(DB_PATH) as db:
         cursor = await db.execute("""
             SELECT
+                tbl_visit.id,
                 tbl_visit.visit_date,
                 table_resorts.name as resort_name,
                 tbl_visit.price_paid
@@ -196,12 +201,125 @@ async def get_visits(email: str, user=Depends(verify_token)):
         visits = await cursor.fetchall()
         return [
             {
+                "id": visit_id,
                 "visit_date": visit_date,
                 "resort": resort_name,
                 "price_paid": price_paid
             }
-            for (visit_date, resort_name, price_paid) in visits
+            for (visit_id, visit_date, resort_name, price_paid) in visits
         ]
+
+@app.delete("/state/{email}/visits/{visit_id}")
+async def delete_visit(email: str, visit_id: int, user=Depends(verify_token)):
+    email = email.lower()
+    if user["email"].lower() != email:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    async with aiosqlite.connect(DB_PATH) as db:
+        # Get the visit to find its price
+        cursor = await db.execute(
+            "SELECT price_paid, user_id FROM table_user_resorts_visits WHERE id = ?",
+            (visit_id,)
+        )
+        visit = await cursor.fetchone()
+        if not visit:
+            raise HTTPException(status_code=404, detail="Visit not found")
+        
+        price_paid, user_id = visit
+        
+        # Verify the visit belongs to the authenticated user
+        cursor = await db.execute("SELECT email FROM table_users WHERE id = ?", (user_id,))
+        user_email = await cursor.fetchone()
+        if not user_email or user_email[0].lower() != email:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Delete the visit
+        await db.execute("DELETE FROM table_user_resorts_visits WHERE id = ?", (visit_id,))
+        
+        # Update user stats
+        cursor = await db.execute(
+            "SELECT counter, total_spent FROM table_users WHERE id = ?",
+            (user_id,)
+        )
+        user_stats = await cursor.fetchone()
+        counter, total_spent = user_stats
+        
+        new_counter = max(0, counter - 1)
+        new_total_spent = max(0, total_spent - price_paid)
+        
+        await db.execute(
+            "UPDATE table_users SET counter = ?, total_spent = ? WHERE id = ?",
+            (new_counter, new_total_spent, user_id)
+        )
+        await db.commit()
+        
+        total_saved = SKIPASS + new_total_spent
+        return {
+            "counter": new_counter,
+            "total_spent": new_total_spent,
+            "total_saved": total_saved
+        }
+
+@app.put("/state/{email}/visits/{visit_id}")
+async def edit_visit(email: str, visit_id: int, payload: EditVisitRequest, user=Depends(verify_token)):
+    email = email.lower()
+    if user["email"].lower() != email:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    async with aiosqlite.connect(DB_PATH) as db:
+        # Get the visit to find its old price and user_id
+        cursor = await db.execute(
+            "SELECT price_paid, user_id FROM table_user_resorts_visits WHERE id = ?",
+            (visit_id,)
+        )
+        visit = await cursor.fetchone()
+        if not visit:
+            raise HTTPException(status_code=404, detail="Visit not found")
+        
+        old_price, user_id = visit
+        
+        # Verify the visit belongs to the authenticated user
+        cursor = await db.execute("SELECT email FROM table_users WHERE id = ?", (user_id,))
+        user_email = await cursor.fetchone()
+        if not user_email or user_email[0].lower() != email:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        new_price = payload.price_paid
+        price_diff = new_price - old_price
+        
+        # Update the visit
+        await db.execute(
+            "UPDATE table_user_resorts_visits SET visit_date = ?, price_paid = ? WHERE id = ?",
+            (payload.visit_date, new_price, visit_id)
+        )
+        
+        # Update user stats
+        cursor = await db.execute(
+            "SELECT counter, total_spent FROM table_users WHERE id = ?",
+            (user_id,)
+        )
+        user_stats = await cursor.fetchone()
+        counter, total_spent = user_stats
+        
+        new_total_spent = total_spent + price_diff
+        
+        await db.execute(
+            "UPDATE table_users SET total_spent = ? WHERE id = ?",
+            (new_total_spent, user_id)
+        )
+        await db.commit()
+        
+        total_saved = SKIPASS + new_total_spent
+        return {
+            "counter": counter,
+            "total_spent": new_total_spent,
+            "total_saved": total_saved,
+            "visit": {
+                "id": visit_id,
+                "visit_date": payload.visit_date,
+                "price_paid": new_price
+            }
+        }
 
 def admin_only(user=Depends(verify_token)):
     if user.get("email") not in ADMIN_GROUP:

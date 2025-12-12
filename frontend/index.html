@@ -24,6 +24,35 @@
     <div class="accordion" id="accordionVisits">Loading...</div>
 </div>
 
+<!-- Edit Visit Modal -->
+<div class="modal fade" id="editVisitModal" tabindex="-1" aria-labelledby="editVisitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editVisitModalLabel">Edit Visit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editVisitForm">
+                    <input type="hidden" id="editVisitId">
+                    <div class="mb-3">
+                        <label for="editVisitDate" class="form-label">Visit Date:</label>
+                        <input type="date" class="form-control" id="editVisitDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editVisitPrice" class="form-label">Price Paid (€):</label>
+                        <input type="number" class="form-control" id="editVisitPrice" step="0.01" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <main class="mt-4">
     <div class="text-center" id="loginDiv" style="display:none">
         <button id="googleLoginBtn" class="btn btn-danger">Sign in with Google</button>

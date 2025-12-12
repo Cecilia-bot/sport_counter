@@ -1,5 +1,5 @@
-// const API_BASE = "http://127.0.0.1:8000";
-const API_BASE = "https://sportcounter-backend.up.railway.app";
+const API_BASE = "http://127.0.0.1:8000";
+// const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 async function loadResorts() {
     const res = await fetch(`${API_BASE}/resorts`);
@@ -90,4 +90,15 @@ firebase.auth().onAuthStateChanged(async (user) => {
         document.getElementById("loginDiv").style.display = "block";
         document.getElementById("appDiv").style.display = "none";
     }
+});
+
+// Listen for visit delete/edit events and update stats
+window.addEventListener('visitDeleted', (e) => {
+    const data = e.detail;
+    updateFields(data);
+});
+
+window.addEventListener('visitEdited', (e) => {
+    const data = e.detail;
+    updateFields(data);
 });
