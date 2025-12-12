@@ -25,8 +25,8 @@
 </div>
 
 <!-- Edit Visit Modal -->
-<div class="modal fade" id="editVisitModal" tabindex="-1" aria-labelledby="editVisitModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="editVisitModal" tabindex="-1" aria-labelledby="editVisitModalLabel" aria-hidden="true" style="z-index: 1200;">
+    <div class="modal-dialog" style="z-index: 1201;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editVisitModalLabel">Edit Visit</h5>
@@ -36,8 +36,8 @@
                 <form id="editVisitForm">
                     <input type="hidden" id="editVisitId">
                     <div class="mb-3">
-                        <label for="editVisitDate" class="form-label">Visit Date:</label>
-                        <input type="date" class="form-control" id="editVisitDate" required>
+                        <label for="editVisitDate" class="form-label">Visit Date & Time:</label>
+                        <input type="datetime-local" class="form-control" id="editVisitDate" required>
                     </div>
                     <div class="mb-3">
                         <label for="editVisitPrice" class="form-label">Price Paid (€):</label>

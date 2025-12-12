@@ -138,7 +138,10 @@ async def add(email: str, payload: AddRequest, user=Depends(verify_token)):
             total_spent = price
             await db.execute("INSERT INTO table_users (email, counter, total_spent, is_admin, last_login) VALUES (?, ?, ?, ?, datetime('now'))",
                              (email, counter, total_spent, is_admin))
-            user_id = cursor.lastrowid
+            # Fetch the newly created user_id by querying the database
+            cursor = await db.execute("SELECT id FROM table_users WHERE email = ?", (email,))
+            row = await cursor.fetchone()
+            user_id = row[0] if row else 0
 
         # create visit
         await db.execute("INSERT INTO table_user_resorts_visits (user_id, resort_id, visit_date, price_paid) VALUES (?, ?, datetime('now'), ?)", 

@@ -61,9 +61,23 @@ function renderResortAccordion(visits) {
         const visitsList = grouped[resort].visits;
 
         // Build the table rows with edit/delete buttons
-        const rows = visitsList.map(v => `
+        const rows = visitsList.map(v => {
+            // Format date: convert "2025-12-12T14:30:00" to "12/12/2025 14:30:00"
+            let formattedDate = v.visit_date;
+            if (v.visit_date.includes('T') || v.visit_date.includes(' ')) {
+                let dateObj = new Date(v.visit_date.replace(' ', 'T'));
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+                formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            }
+            
+            return `
             <tr>
-                <td>${v.visit_date}</td>
+                <td>${formattedDate}</td>
                 <td>${v.price_paid} €</td>
                 <td>
                     <button class="btn btn-sm btn-warning edit-visit-btn" data-visit-id="${v.id}" data-visit-date="${v.visit_date}" data-visit-price="${v.price_paid}" title="Edit">
@@ -74,7 +88,7 @@ function renderResortAccordion(visits) {
                     </button>
                 </td>
             </tr>
-        `).join("");
+        `}).join("");
 
         const html = `
         <div class="accordion-item">
@@ -169,8 +183,8 @@ async function deleteVisit(visitId) {
         const updateFieldsEvent = new CustomEvent('visitDeleted', { detail: data });
         window.dispatchEvent(updateFieldsEvent);
 
-        // Reload visits panel
-        loadVisits();
+        // Reload visits panel without closing accordion
+        loadVisitsPreserveState();
     } catch (error) {
         console.error('Error deleting visit:', error);
         alert('Failed to delete visit');
@@ -180,9 +194,18 @@ async function deleteVisit(visitId) {
 function openEditModal(visitId, visitDate, visitPrice) {
     const modal = new bootstrap.Modal(document.getElementById('editVisitModal'));
     
+    // Convert ISO string to datetime-local format (remove timezone and milliseconds)
+    // Example: "2025-12-12T14:30:00" or "2025-12-12 14:30:00"
+    let datetimeValue = visitDate;
+    if (datetimeValue.includes(' ')) {
+        datetimeValue = datetimeValue.replace(' ', 'T');
+    }
+    // Ensure it's in the format yyyy-MM-ddTHH:mm:ss for datetime-local input
+    datetimeValue = datetimeValue.substring(0, 19);
+    
     // Populate form
     document.getElementById('editVisitId').value = visitId;
-    document.getElementById('editVisitDate').value = visitDate;
+    document.getElementById('editVisitDate').value = datetimeValue;
     document.getElementById('editVisitPrice').value = visitPrice;
     
     modal.show();
@@ -225,13 +248,48 @@ document.getElementById('saveEditBtn').addEventListener('click', async () => {
         const updateFieldsEvent = new CustomEvent('visitEdited', { detail: data });
         window.dispatchEvent(updateFieldsEvent);
 
-        // Close modal and reload visits
+        // Close modal and reload visits without closing accordion
         const modal = bootstrap.Modal.getInstance(document.getElementById('editVisitModal'));
         modal.hide();
         
-        loadVisits();
+        loadVisitsPreserveState();
     } catch (error) {
         console.error('Error updating visit:', error);
         alert('Failed to update visit');
     }
 });
+
+// Helper function to reload visits while preserving accordion open/closed state
+async function loadVisitsPreserveState() {
+    const user = await waitForAuth();
+    if (!user) {
+        alert("Not signed in");
+        return;
+    }
+
+    // Store which accordions are currently open
+    const openAccordions = new Set();
+    document.querySelectorAll('.accordion-collapse.show').forEach(item => {
+        openAccordions.add(item.id);
+    });
+
+    const token = await user.getIdToken(false);
+    const email = encodeURIComponent(user.email);
+    const res = await fetch(`${API_BASE}/state/${email}/visits`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+    const visits = await res.json();
+    renderResortAccordion(visits);
+    
+    // Restore the open state of accordions
+    openAccordions.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.classList.add('show');
+        }
+    });
+}
