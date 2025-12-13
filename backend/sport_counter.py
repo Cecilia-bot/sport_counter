@@ -73,6 +73,7 @@ async def startup():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL, 
             price REAL NOT NULL,
+            is_deleted INTEGER DEFAULT 0,
             updated_at TEXT DEFAULT (datetime('now'))
         )""")
         await db.execute("""
@@ -332,7 +333,7 @@ def admin_only(user=Depends(verify_token)):
 @app.get("/resorts")
 async def list_resorts():
     async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("SELECT id, name, price, updated_at FROM table_resorts ORDER BY name ASC")
+        cursor = await db.execute("SELECT id, name, price, updated_at FROM table_resorts WHERE is_deleted = 0 ORDER BY name ASC")
         rows = await cursor.fetchall()
         return [
             {
@@ -361,6 +362,35 @@ async def add_resort(resort: Resort, user=Depends(admin_only)):
             return {"id": resort_id, "message": "Resort added successfully!"}
         except Exception as e:
             return{"error": str(e)}
+
+@app.put("/resorts/{resort_id}")
+async def edit_resort(resort_id: int, resort: Resort, user=Depends(admin_only)):
+    async with aiosqlite.connect(DB_PATH) as db:
+        try:
+            await db.execute(
+                "UPDATE table_resorts SET name = ?, price = ? WHERE id = ?",
+                (resort.name.lower(), resort.price, resort_id)
+            )
+            await db.commit()
+            return {"id": resort_id, "message": "Resort updated successfully!"}
+        except Exception as e:
+            return {"error": str(e)}
+
+@app.delete("/resorts/{resort_id}")
+async def delete_resort(resort_id: int, user=Depends(admin_only)):
+    async with aiosqlite.connect(DB_PATH) as db:
+        try:
+            # Check if resort exists
+            cursor = await db.execute("SELECT id FROM table_resorts WHERE id = ?", (resort_id,))
+            if not await cursor.fetchone():
+                raise HTTPException(status_code=404, detail="Resort not found")
+            
+            # Soft delete: mark as deleted instead of actually deleting
+            await db.execute("UPDATE table_resorts SET is_deleted = 1 WHERE id = ?", (resort_id,))
+            await db.commit()
+            return {"message": "Resort deleted successfully!"}
+        except Exception as e:
+            return {"error": str(e)}
 
 @app.get("/admin/download-db")
 async def download_db(user=Depends(admin_only)):

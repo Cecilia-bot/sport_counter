@@ -1,7 +1,7 @@
 const API_BASE = "http://127.0.0.1:8000";
 // const API_BASE = "https://sportcounter-backend.up.railway.app";
 
-function waitForAuth() {
+async function waitForAuth() {
     return new Promise(resolve => {
         firebase.auth().onAuthStateChanged(user => {
             resolve(user);
