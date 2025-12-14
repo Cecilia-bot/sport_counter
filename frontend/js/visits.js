@@ -62,17 +62,13 @@ function renderResortAccordion(visits) {
 
         // Build the table rows with edit/delete buttons
         const rows = visitsList.map(v => {
-            // Format date: convert "2025-12-12T14:30:00" to "12/12/2025 14:30:00"
             let formattedDate = v.visit_date;
             if (v.visit_date.includes('T') || v.visit_date.includes(' ')) {
-                let dateObj = new Date(v.visit_date.replace(' ', 'T'));
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const year = dateObj.getFullYear();
-                const hours = String(dateObj.getHours()).padStart(2, '0');
-                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-                const seconds = String(dateObj.getSeconds()).padStart(2, '0');
-                formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                const dateObj = new Date(v.visit_date.replace(' ', 'T'));
+                // Use separate date and time localization to avoid locale-specific separators (some locales insert a comma between date and time)
+                const datePart = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const timePart = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                formattedDate = `${datePart} ${timePart}`;
             }
             
             return `
