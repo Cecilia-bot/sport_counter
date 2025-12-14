@@ -9,26 +9,6 @@ async function waitForAuth() {
     });
 }
 
-export async function loadVisits() {
-    const user = await waitForAuth();   // <-- ⭐ VERY important
-    if (!user) {
-        alert("Not signed in");
-        return;
-    }
-
-    const token = await user.getIdToken(/* forceRefresh */ false);
-    const email = encodeURIComponent(user.email);
-    const res = await fetch(`${API_BASE}/state/${email}/visits`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        }
-    });
-
-    const visits = await res.json();
-    renderResortAccordion(visits);
-}
-
 function groupByResort(visits) {
     const map = {};
 
@@ -55,6 +35,7 @@ function renderResortAccordion(visits) {
 
     resorts.forEach((resort, index) => {
         const collapseId = `collapse-${index}`;
+        const collapseBtnId = `collapse-btn-${index}`;
         const headerId = `heading-${index}`;
 
         const totalPrice = grouped[resort].total;
@@ -89,7 +70,7 @@ function renderResortAccordion(visits) {
         const html = `
         <div class="accordion-item">
             <h2 class="accordion-header" id="${headerId}">
-                <button class="accordion-button collapsed" type="button"
+                <button id="${collapseBtnId}" class="accordion-button collapsed" type="button"
                     data-bs-toggle="collapse" data-bs-target="#${collapseId}"
                     aria-expanded="false" aria-controls="${collapseId}">
                     <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)} </strong>&nbsp;${visitsList.length} time(s) - ${totalPrice} €
@@ -256,7 +237,7 @@ document.getElementById('saveEditBtn').addEventListener('click', async () => {
 });
 
 // Helper function to reload visits while preserving accordion open/closed state
-async function loadVisitsPreserveState() {
+export async function loadVisitsPreserveState() {
     const user = await waitForAuth();
     if (!user) {
         alert("Not signed in");
@@ -284,8 +265,8 @@ async function loadVisitsPreserveState() {
     // Restore the open state of accordions
     openAccordions.forEach(id => {
         const element = document.getElementById(id);
-        if (element) {
-            element.classList.add('show');
-        }
+        const btnElement = document.getElementById(`collapse-btn-${id.split('-')[1]}`);
+        if (element) element.classList.add('show');
+        if (btnElement) btnElement.classList.remove('collapsed');
     });
 }
