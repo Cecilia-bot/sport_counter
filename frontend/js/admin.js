@@ -21,10 +21,10 @@ async function loadResorts() {
         li.innerHTML = `
             <span>${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €</span>
             <div>
-                <button class="btn btn-sm btn-warning edit-resort-btn" data-resort-id="${resort.id}" data-resort-name="${resort.name}" data-resort-price="${resort.price}" title="Edit">
+                <button class="btn btn-sm btn-outline-primary edit-resort-btn" data-resort-id="${resort.id}" data-resort-name="${resort.name}" data-resort-price="${resort.price}" title="Edit">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-danger delete-resort-btn" data-resort-id="${resort.id}" title="Delete">
+                <button class="btn btn-sm btn-outline-danger delete-resort-btn" data-resort-id="${resort.id}" title="Delete">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
