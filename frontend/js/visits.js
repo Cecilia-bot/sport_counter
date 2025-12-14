@@ -1,5 +1,5 @@
-const API_BASE = "http://127.0.0.1:8000";
-// const API_BASE = "https://sportcounter-backend.up.railway.app";
+// const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 async function waitForAuth() {
     return new Promise(resolve => {
@@ -57,10 +57,10 @@ function renderResortAccordion(visits) {
                 <td>${formattedDate}</td>
                 <td>${v.price_paid} €</td>
                 <td>
-                    <button class="btn btn-sm btn-warning edit-visit-btn" data-visit-id="${v.id}" data-visit-date="${v.visit_date}" data-visit-price="${v.price_paid}" title="Edit">
+                    <button class="btn btn-sm btn-outline-primary edit-visit-btn" data-visit-id="${v.id}" data-visit-date="${v.visit_date}" data-visit-price="${v.price_paid}" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger delete-visit-btn" data-visit-id="${v.id}" title="Delete">
+                    <button class="btn btn-sm btn-outline-danger delete-visit-btn" data-visit-id="${v.id}" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
