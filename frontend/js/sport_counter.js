@@ -91,3 +91,14 @@ firebase.auth().onAuthStateChanged(async (user) => {
         document.getElementById("appDiv").style.display = "none";
     }
 });
+
+// Listen for visit delete/edit events and update stats
+window.addEventListener('visitDeleted', (e) => {
+    const data = e.detail;
+    updateFields(data);
+});
+
+window.addEventListener('visitEdited', (e) => {
+    const data = e.detail;
+    updateFields(data);
+});
