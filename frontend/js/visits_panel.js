@@ -106,13 +106,17 @@ visitsPanel.addEventListener('pointercancel', finishPointerDrag);
 // also allow tapping the small handle area to open when closed
 function updateFloatingBtn() {
     // floating button visible when visitsPanel is closed on all devices;
+
+    //TO REVISE!!! WHY DID WE DECIDE THIS?
     // when visitsPanel is open, only show the button on larger screens (>=900px)
     if (!visitsPanel) return;
-    if (!visitsPanel.classList.contains('active')) {
-        openVisitsBtn.style.display = 'block';
-    } else {
-        openVisitsBtn.style.display = (window.innerWidth >= 900) ? 'block' : 'none';
-    }
+    //if (!visitsPanel.classList.contains('active')) {
+    openVisitsBtn.style.display = 'block';
+    //} else {
+    //    openVisitsBtn.style.display = (window.innerWidth >= 900) ? 'block' : 'block';
+    //}
+
+    
 }
 
 // also allow tapping the small handle area to open when closed, and to close when open
