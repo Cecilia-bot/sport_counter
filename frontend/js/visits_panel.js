@@ -28,7 +28,15 @@ let pointerDown = false;    // true between pointerdown and pointerup
 
 visitsPanel.addEventListener('pointerdown', (e) => {
     // only handle primary pointers (mouse left button / single touch)
-    if (e.isPrimary === false) return;
+    // if (e.isPrimary === false) return;
+
+    const rect = visitsPanel.getBoundingClientRect();
+    const clickY = e.clientY - rect.top;
+    const HANDLE_HEIGHT = 48;
+
+    // Only allow drag from handle area
+    if (clickY > HANDLE_HEIGHT) return;
+
     // For mouse on small screens we prefer not to start drag (mobile UI)
     if (e.pointerType === 'mouse' && window.innerWidth < 900) return;
     startY = e.clientY;
@@ -36,14 +44,15 @@ visitsPanel.addEventListener('pointerdown', (e) => {
     pointerDown = true;
     activePointerId = e.pointerId;
     // do NOT disable transitions yet; wait until user actually moves enough to be considered dragging
+    
 });
 
 visitsPanel.addEventListener('pointermove', (e) => {
     if (!pointerDown || e.pointerId !== activePointerId) return;
     currentY = e.clientY;
-    const delta = currentY - startY;
+    const deltaY = currentY - startY;
     // only respond to vertical moves beyond a small threshold
-    if (Math.abs(delta) > 6) {
+    if (Math.abs(deltaY) > 6) {
         // when first crossing the threshold, enter dragging mode and disable transition
         if (!touching) {
             touching = true;
@@ -56,49 +65,39 @@ visitsPanel.addEventListener('pointermove', (e) => {
             }
         }
         // apply a translate while dragging (delta positive moves it down)
-        visitsPanel.style.transform = `translateY(${Math.max(0, delta)}px)`;
+        visitsPanel.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
     }
 });
 
-function finishPointerDrag(e) {
-    // clear pointerDown flag
+function finishPointerDrag() {
+    if (!pointerDown) return;
+
     pointerDown = false;
     const delta = currentY - startY;
-    // if we never entered dragging mode, just ensure we clear any partial inline styles
-    if (!touching) {
-        visitsPanel.style.transition = '';
-        visitsPanel.style.transform = '';
-        try {
-            if (activePointerId != null) visitsPanel.releasePointerCapture(activePointerId);
-        } catch (err) {}
-        activePointerId = null;
-        return;
-    }
+
+    // stop dragging
     touching = false;
-    // restore transition (we'll animate from current inline transform to the target)
     visitsPanel.style.transition = '';
-    // release pointer capture if we set it
+
     try {
-        if (activePointerId != null) visitsPanel.releasePointerCapture(activePointerId);
-    } catch (err) {}
-    activePointerId = null;
-    // if the drag was significant, toggle state
-    if (delta > 60) {
-        // dragged down -> close
-        visitsPanel.classList.remove('active');
-    } else if (delta < -60) {
-        // dragged up -> open
-        if (!visitsPanel.classList.contains('active')) {
-            visitsPanel.classList.add('active');
-            loadVisitsPreserveState();
+        if (activePointerId != null) {
+            visitsPanel.releasePointerCapture(activePointerId);
         }
+    } catch (err) {}
+
+    activePointerId = null;
+
+    // CLOSE if dragged down enough
+    if (delta > 80) {
+        visitsPanel.classList.remove('active');
     }
-    // allow CSS to animate from the current inline transform to the new class transform
-    requestAnimationFrame(() => {
-        visitsPanel.style.transform = '';
-        updateFloatingBtn();
-    });
+
+    // Snap back / animate naturally via CSS
+    visitsPanel.style.transform = '';
+
+    updateFloatingBtn();
 }
+
 
 visitsPanel.addEventListener('pointerup', finishPointerDrag);
 visitsPanel.addEventListener('pointercancel', finishPointerDrag);
@@ -107,7 +106,7 @@ visitsPanel.addEventListener('pointercancel', finishPointerDrag);
 function updateFloatingBtn() {
     // floating button visible when visitsPanel is closed on all devices;
 
-    //TO REVISE!!! WHY DID WE DECIDE THIS?
+    //RESTORE TO NORMAL ONCE WE HAVE AT LEAST 2 WAZS TO CLOSE THE PANEL
     // when visitsPanel is open, only show the button on larger screens (>=900px)
     if (!visitsPanel) return;
     //if (!visitsPanel.classList.contains('active')) {
@@ -116,7 +115,7 @@ function updateFloatingBtn() {
     //    openVisitsBtn.style.display = (window.innerWidth >= 900) ? 'block' : 'block';
     //}
 
-    
+
 }
 
 // also allow tapping the small handle area to open when closed, and to close when open
