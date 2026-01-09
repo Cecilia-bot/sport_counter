@@ -35,6 +35,10 @@ let activePointerId = null;
 let pointerDown = false;    // true between pointerdown and pointerup
 let isDraggingPanel = false;
 
+// Mouse-based drag support for desktop
+let mouseDown = false;
+let wasDragged = false;
+
 visitsPanel.addEventListener('pointerdown', (e) => {
     const rect = visitsPanel.getBoundingClientRect();
     const clickY = e.clientY - rect.top;
@@ -84,6 +88,8 @@ function finishPointerDrag() {
 
     pointerDown = false;
     const delta = currentY - startY;
+    const panelHeight = visitsPanel.offsetHeight;
+    const threshold = panelHeight * 0.4; // 40% of panel height
 
     visitsPanel.releasePointerCapture(activePointerId);
     isDraggingPanel = false;
@@ -91,8 +97,8 @@ function finishPointerDrag() {
     visitsPanel.classList.remove('dragging');
     visitsPanel.style.transition = ''; // restore transition
 
-    // CLOSE if dragged down enough
-    if (delta > 80) {
+    // CLOSE if dragged down enough (40% of panel height)
+    if (delta > threshold) {
         visitsPanel.classList.remove('active');
     }
 
@@ -101,10 +107,64 @@ function finishPointerDrag() {
 
     updateFloatingBtn();
     isDragging = false;
+    if (Math.abs(delta) > 5) wasDragged = true;
 }
 
 visitsPanel.addEventListener('pointerup', finishPointerDrag);
 visitsPanel.addEventListener('pointercancel', finishPointerDrag);
+
+// Mouse event listeners for desktop drag support
+visitsPanel.addEventListener('mousedown', (e) => {
+    const rect = visitsPanel.getBoundingClientRect();
+    const clickY = e.clientY - rect.top;
+    const HANDLE_HEIGHT = 48;
+
+    if (clickY > HANDLE_HEIGHT) {
+        return;
+    }
+
+    e.preventDefault();
+    startY = e.clientY;
+    currentY = startY;
+    mouseDown = true;
+    visitsPanel.classList.add('dragging');
+    visitsPanel.style.transition = 'none';
+    isDragging = true;
+});
+
+visitsPanel.addEventListener('mousemove', (e) => {
+    if (!mouseDown) return;
+
+    e.preventDefault();
+    currentY = e.clientY;
+    const deltaY = currentY - startY;
+
+    if (deltaY > 0) {
+        visitsPanel.style.transform = `translateY(${deltaY}px)`;
+    }
+});
+
+visitsPanel.addEventListener('mouseup', () => {
+    if (!mouseDown) return;
+
+    mouseDown = false;
+    const delta = currentY - startY;
+    const panelHeight = visitsPanel.offsetHeight;
+    const threshold = panelHeight * 0.4;
+
+    visitsPanel.classList.remove('dragging');
+    visitsPanel.style.transition = '';
+
+    if (delta > threshold) {
+        visitsPanel.classList.remove('active');
+    }
+
+    visitsPanel.style.transform = '';
+
+    updateFloatingBtn();
+    isDragging = false;
+    if (Math.abs(delta) > 5) wasDragged = true;
+});
 
 // also allow tapping the small handle area to open when closed
 function updateFloatingBtn() {
@@ -124,6 +184,11 @@ function updateFloatingBtn() {
 
 // also allow tapping the small handle area to open when closed, and to close when open
 visitsPanel.addEventListener('click', (e) => {
+    if (wasDragged) {
+        wasDragged = false;
+        return;
+    }
+
     const rect = visitsPanel.getBoundingClientRect();
     const clickY = e.clientY - rect.top; // distance from top of visitsPanel
     const HANDLE_HEIGHT = 48; // pixels from top considered the handle
