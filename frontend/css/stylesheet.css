@@ -164,6 +164,11 @@ footer a:hover {
     -webkit-transform: translateY(0);
 }
 
+.slide-panel.dragging {
+    overflow: hidden;      /* disable scrolling */
+    touch-action: none;    /* disable browser gestures */
+}
+
 /* Desktop: slightly smaller overlay so title remains visible */
 /* Show floating button only on larger (desktop) viewports */
 @media (min-width: 900px) {

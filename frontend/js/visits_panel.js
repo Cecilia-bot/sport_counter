@@ -3,6 +3,15 @@ import { loadVisitsPreserveState } from './visits.js';
 const visitsPanel = document.getElementById("visitsPanel");
 const openVisitsBtn = document.getElementById("openVisitsBtn");
 
+// Prevent scrolling during drag
+let isDragging = false;
+
+document.addEventListener('touchmove', function(e) {
+    if (isDragging) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 // toggle visibility on click
 openVisitsBtn.addEventListener("click", () => {
     const opening = !visitsPanel.classList.contains("active");
@@ -22,50 +31,51 @@ openVisitsBtn.addEventListener("click", () => {
 // Pointer-based drag support: supports touch and mouse (desktop dragging)
 let startY = 0;
 let currentY = 0;
-let touching = false;       // true when we've started a real drag
 let activePointerId = null;
 let pointerDown = false;    // true between pointerdown and pointerup
+let isDraggingPanel = false;
 
 visitsPanel.addEventListener('pointerdown', (e) => {
-    // only handle primary pointers (mouse left button / single touch)
-    // if (e.isPrimary === false) return;
-
     const rect = visitsPanel.getBoundingClientRect();
     const clickY = e.clientY - rect.top;
     const HANDLE_HEIGHT = 48;
 
-    // Only allow drag from handle area
-    if (clickY > HANDLE_HEIGHT) return;
+    // only handle drag if touch starts on handle
+    if (clickY > HANDLE_HEIGHT) {
+        // ❌ content area → allow normal scrolling
+        isDraggingPanel = false; 
+        return;
+    }
 
-    // For mouse on small screens we prefer not to start drag (mobile UI)
-    if (e.pointerType === 'mouse' && window.innerWidth < 900) return;
+    // ✅ handle touched → panel owns the gesture
+    isDraggingPanel = true;
+
+    e.preventDefault();
+    visitsPanel.setPointerCapture(e.pointerId);
+
     startY = e.clientY;
     currentY = startY;
     pointerDown = true;
     activePointerId = e.pointerId;
-    // do NOT disable transitions yet; wait until user actually moves enough to be considered dragging
-    
+    visitsPanel.classList.add('dragging');
+    visitsPanel.style.transition = 'none'; // disable transition during drag for immediate response
+    isDragging = true;
 });
 
+
 visitsPanel.addEventListener('pointermove', (e) => {
-    if (!pointerDown || e.pointerId !== activePointerId) return;
+    if (
+        !pointerDown || 
+        !isDraggingPanel ||
+        e.pointerId !== activePointerId
+    ) return;
+
+    e.preventDefault();
     currentY = e.clientY;
     const deltaY = currentY - startY;
-    // only respond to vertical moves beyond a small threshold
-    if (Math.abs(deltaY) > 6) {
-        // when first crossing the threshold, enter dragging mode and disable transition
-        if (!touching) {
-            touching = true;
-            visitsPanel.style.transition = 'none';
-            // only capture the pointer when we start dragging so clicks still reach inner elements
-            try {
-                visitsPanel.setPointerCapture(activePointerId);
-            } catch (err) {
-                // ignore if not supported
-            }
-        }
-        // apply a translate while dragging (delta positive moves it down)
-        visitsPanel.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
+
+    if (deltaY > 0) {
+        visitsPanel.style.transform = `translateY(${deltaY}px)`;
     }
 });
 
@@ -75,17 +85,11 @@ function finishPointerDrag() {
     pointerDown = false;
     const delta = currentY - startY;
 
-    // stop dragging
-    touching = false;
-    visitsPanel.style.transition = '';
+    visitsPanel.releasePointerCapture(activePointerId);
+    isDraggingPanel = false;
 
-    try {
-        if (activePointerId != null) {
-            visitsPanel.releasePointerCapture(activePointerId);
-        }
-    } catch (err) {}
-
-    activePointerId = null;
+    visitsPanel.classList.remove('dragging');
+    visitsPanel.style.transition = ''; // restore transition
 
     // CLOSE if dragged down enough
     if (delta > 80) {
@@ -96,8 +100,8 @@ function finishPointerDrag() {
     visitsPanel.style.transform = '';
 
     updateFloatingBtn();
+    isDragging = false;
 }
-
 
 visitsPanel.addEventListener('pointerup', finishPointerDrag);
 visitsPanel.addEventListener('pointercancel', finishPointerDrag);
