@@ -138,19 +138,19 @@ footer a:hover {
     padding: 18px 18px 24px 18px;
     transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
     z-index: 1100;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; 
     box-sizing: border-box;
     /* start hidden by translating it fully down */
     transform: translateY(100%);
     -webkit-transform: translateY(100%);
-    touch-action: pan-y; /* allow custom touch handling */
 }
 
-/* add a small visible handle so users know they can swipe */
-.slide-panel::before {
-    content: '';
-    display: block;
+/* when active, bring it into view */
+.slide-panel.active {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+}
+
+.panel-handle {
     width: 56px;
     height: 6px;
     background: #e0e0e0;
@@ -158,10 +158,10 @@ footer a:hover {
     margin: 6px auto 12px auto;
 }
 
-/* when active, bring it into view */
-.slide-panel.active {
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
+.panel-content {
+    height: calc(100% - 48px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .slide-panel.dragging {
