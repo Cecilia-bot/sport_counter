@@ -128,9 +128,9 @@ footer a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    /* cover ~95% of viewport so a small top area remains visible */
-    height: 95vh;
-    max-height: 95vh;
+    /* cover ~90% of viewport so a small top area remains visible */
+    height: 90vh;
+    max-height: 90vh;
     background: white;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
