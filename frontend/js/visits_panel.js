@@ -170,16 +170,13 @@ visitsPanel.addEventListener('mouseup', () => {
 function updateFloatingBtn() {
     // floating button visible when visitsPanel is closed on all devices;
 
-    //RESTORE TO NORMAL ONCE WE HAVE AT LEAST 2 WAZS TO CLOSE THE PANEL
     // when visitsPanel is open, only show the button on larger screens (>=900px)
     if (!visitsPanel) return;
-    //if (!visitsPanel.classList.contains('active')) {
-    openVisitsBtn.style.display = 'block';
-    //} else {
-    //    openVisitsBtn.style.display = (window.innerWidth >= 900) ? 'block' : 'block';
-    //}
-
-
+    if (!visitsPanel.classList.contains('active')) {
+        openVisitsBtn.style.display = 'block';
+    } else {
+        openVisitsBtn.style.display = (window.innerWidth >= 900) ? 'block' : 'none';
+    }
 }
 
 // also allow tapping the small handle area to open when closed, and to close when open
