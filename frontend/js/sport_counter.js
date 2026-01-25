@@ -1,5 +1,5 @@
-//const API_BASE = "http://127.0.0.1:8000";
-const API_BASE = "https://sportcounter-backend.up.railway.app";
+const API_BASE = "http://127.0.0.1:8000";
+//const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 async function loadResorts() {
     const res = await fetch(`${API_BASE}/resorts`);
@@ -14,6 +14,8 @@ async function loadResorts() {
         dropdown.appendChild(option);
     });
 }
+
+const resortSelect = document.getElementById('resort');
 
 async function updateFields(data) {
     document.getElementById("counter").innerText = data.counter;
@@ -76,7 +78,6 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     updateFields(data);
 });
 
-
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
         // show app UI
@@ -84,6 +85,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
         document.getElementById("appDiv").style.display = "block";
         // user is signed in — load data and update UI
         await loadResorts();
+        $('#resort').selectpicker('refresh');
         await updateState();
     } else {
         // user signed out — clear UI or show login prompt
