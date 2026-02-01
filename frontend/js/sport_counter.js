@@ -7,6 +7,15 @@ async function loadResorts() {
 
     const dropdown = document.getElementById("resort");
     dropdown.innerHTML = "";
+    
+    // Add placeholder option
+    const placeholder = document.createElement("option");
+    placeholder.textContent = "Select a resort...";
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    dropdown.appendChild(placeholder);
+    
     resorts.forEach(resort => {
         const option = document.createElement("option");
         option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;

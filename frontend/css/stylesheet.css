@@ -182,6 +182,14 @@ footer a:hover {
     }
 }
 
+/* Small phones: make sure it still leaves a tiny visible gap */
+@media (max-height: 480px) {
+    .slide-panel {
+        height: 94vh;
+        max-height: 94vh;
+    }
+}
+
 .bootstrap-select .dropdown-toggle {
     background-color: white !important;
     border: 1px solid #ced4da;
