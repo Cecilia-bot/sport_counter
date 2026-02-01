@@ -9,10 +9,14 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #f8f9fa;
     color: #212529;
     font-family: 'Segoe UI', Roboto, sans-serif;
     position: relative;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* background: #001f3f;  */
+    background-image: url('../images/background-day.png');
 }
 
 main {
@@ -35,13 +39,18 @@ footer {
 }
 
 .sc-title, .sc-subtitle, h3 {
-    color: #05276e;           /* dark blue tone */
-    font-weight: 700;
+    color: #05276e;         
+    font-family: "Rubik Distressed", system-ui;
+    font-style: normal;
+    font-weight: 400;
+    text-shadow:
+        0 2px 6px rgba(255,255,255,0.6),
+        0 4px 12px rgba(0,0,0,0.15);
 }
 
 .sc-title {
     padding-bottom: 0.5rem;
-    font-size: 2rem;
+    font-size: 2.5rem;
 }
 
 .sc-subtitle {
@@ -63,6 +72,7 @@ hr {
 .card {
     border: none;
     border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.6); 
 }
 
 .text-muted {
@@ -109,7 +119,7 @@ footer a:hover {
     position: fixed;
     bottom: 71px;
     right: 20px;
-    background: #0d6efd;
+    background: #05276e;
     color: white;
     border-radius: 50%;
     border: none;
@@ -122,6 +132,11 @@ footer a:hover {
     display: none; /* hidden by default on small screens; shown on desktop via media query */
 }
 
+.add-btn {
+    background: #05276e !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
 /* Slide-up panel: use transform for smoother animation and viewport-relative sizing */
 .slide-panel {
     position: fixed;
@@ -131,7 +146,7 @@ footer a:hover {
     /* cover ~90% of viewport so a small top area remains visible */
     height: 90vh;
     max-height: 90vh;
-    background: white;
+    background-color: rgba(255, 255, 255, 0.95);
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
     box-shadow: 0 -8px 20px rgba(0,0,0,0.18);
@@ -193,4 +208,22 @@ footer a:hover {
 .bootstrap-select .dropdown-toggle {
     background-color: white !important;
     border: 1px solid #ced4da;
+}
+
+.snowflake {
+  /* position: absolute; */
+  top: -10px;
+  font-size: 16px;
+  color: white;
+  opacity: 0.8;
+  animation: fall linear infinite;
+  position: fixed; /* Keeps snowflakes in viewport, independent of scrolling */
+  pointer-events: none; /* Prevents snowflakes from blocking interactions */
+  z-index: 9999; /* Place snow on top, but not interfering with UI */
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
 }
