@@ -1,20 +1,16 @@
-const API_BASE = "http://127.0.0.1:8000";
-//const API_BASE = "https://sportcounter-backend.up.railway.app";
+// const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://sportcounter-backend.up.railway.app";
+
+const resortSelect = document.getElementById('resort');
+const addBtn = document.getElementById("addBtn");
+resortSelect.addEventListener("change", () => {
+    addBtn.disabled = resortSelect.value === "";
+});
 
 async function loadResorts() {
     const res = await fetch(`${API_BASE}/resorts`);
     const resorts = await res.json();
-
     const dropdown = document.getElementById("resort");
-    dropdown.innerHTML = "";
-    
-    // Add placeholder option
-    const placeholder = document.createElement("option");
-    placeholder.textContent = "Select a resort...";
-    placeholder.value = "";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    dropdown.appendChild(placeholder);
     
     resorts.forEach(resort => {
         const option = document.createElement("option");
@@ -24,7 +20,6 @@ async function loadResorts() {
     });
 }
 
-const resortSelect = document.getElementById('resort');
 
 async function updateFields(data) {
     document.getElementById("counter").innerText = data.counter;
@@ -39,6 +34,8 @@ async function updateFields(data) {
     if (data.is_admin) {
         document.getElementById("goToAdmin").classList.remove(["hide"]);
     }
+    addBtn.disabled = true;
+    $('#resort').selectpicker('val', '');
 }
 
 async function updateState() {
