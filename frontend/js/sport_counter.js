@@ -1,12 +1,17 @@
-//const API_BASE = "http://127.0.0.1:8000";
+// const API_BASE = "http://127.0.0.1:8000";
 const API_BASE = "https://sportcounter-backend.up.railway.app";
+
+const resortSelect = document.getElementById('resort');
+const addBtn = document.getElementById("addBtn");
+resortSelect.addEventListener("change", () => {
+    addBtn.disabled = resortSelect.value === "";
+});
 
 async function loadResorts() {
     const res = await fetch(`${API_BASE}/resorts`);
     const resorts = await res.json();
-
     const dropdown = document.getElementById("resort");
-    dropdown.innerHTML = "";
+    
     resorts.forEach(resort => {
         const option = document.createElement("option");
         option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;
@@ -14,6 +19,7 @@ async function loadResorts() {
         dropdown.appendChild(option);
     });
 }
+
 
 async function updateFields(data) {
     document.getElementById("counter").innerText = data.counter;
@@ -28,6 +34,8 @@ async function updateFields(data) {
     if (data.is_admin) {
         document.getElementById("goToAdmin").classList.remove(["hide"]);
     }
+    addBtn.disabled = true;
+    $('#resort').selectpicker('val', '');
 }
 
 async function updateState() {
@@ -76,7 +84,6 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     updateFields(data);
 });
 
-
 firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
         // show app UI
@@ -84,6 +91,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
         document.getElementById("appDiv").style.display = "block";
         // user is signed in — load data and update UI
         await loadResorts();
+        $('#resort').selectpicker('refresh');
         await updateState();
     } else {
         // user signed out — clear UI or show login prompt
