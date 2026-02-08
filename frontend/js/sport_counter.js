@@ -1,5 +1,5 @@
-// const API_BASE = "http://127.0.0.1:8000";
-const API_BASE = "https://sportcounter-backend.up.railway.app";
+const API_BASE = "http://127.0.0.1:8000";
+// const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 const resortSelect = document.getElementById('resort');
 const addBtn = document.getElementById("addBtn");
@@ -14,7 +14,7 @@ async function loadResorts() {
     
     resorts.forEach(resort => {
         const option = document.createElement("option");
-        option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;
+        option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price.toFixed(2)} €`;
         option.value = `${resort.name}`;
         dropdown.appendChild(option);
     });
