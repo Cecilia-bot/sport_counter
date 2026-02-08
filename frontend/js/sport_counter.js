@@ -1,5 +1,5 @@
-const API_BASE = "http://127.0.0.1:8000";
-// const API_BASE = "https://sportcounter-backend.up.railway.app";
+// const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://sportcounter-backend.up.railway.app";
 
 const resortSelect = document.getElementById('resort');
 const addBtn = document.getElementById("addBtn");
