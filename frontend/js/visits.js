@@ -55,9 +55,9 @@ function renderResortAccordion(visits) {
             return `
             <tr>
                 <td>${formattedDate}</td>
-                <td>${v.price_paid} €</td>
+                <td>${v.price_paid.toFixed(2)} €</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary edit-visit-btn" data-visit-id="${v.id}" data-visit-date="${v.visit_date}" data-visit-price="${v.price_paid}" title="Edit">
+                    <button class="btn btn-sm btn-outline-primary edit-visit-btn" data-visit-id="${v.id}" data-visit-date="${v.visit_date}" data-visit-price="${v.price_paid.toFixed(2)}" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger delete-visit-btn" data-visit-id="${v.id}" title="Delete">
@@ -73,7 +73,7 @@ function renderResortAccordion(visits) {
                 <button id="${collapseBtnId}" class="accordion-button collapsed" type="button"
                     data-bs-toggle="collapse" data-bs-target="#${collapseId}"
                     aria-expanded="false" aria-controls="${collapseId}">
-                    <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)} </strong>&nbsp;${visitsList.length} time(s) - ${totalPrice} €
+                    <strong>${resort.charAt(0).toUpperCase() + resort.slice(1,)} </strong>&nbsp;${visitsList.length} time(s) - ${totalPrice.toFixed(2)} €
                 </button>
             </h2>
 

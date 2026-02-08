@@ -19,9 +19,9 @@ async function loadResorts() {
         const li = document.createElement("li");
         li.className = "list-group-item d-flex justify-content-between align-items-center";
         li.innerHTML = `
-            <span>${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €</span>
+            <span>${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price.toFixed(2)} €</span>
             <div>
-                <button class="btn btn-sm btn-outline-primary edit-resort-btn" data-resort-id="${resort.id}" data-resort-name="${resort.name}" data-resort-price="${resort.price}" title="Edit">
+                <button class="btn btn-sm btn-outline-primary edit-resort-btn" data-resort-id="${resort.id}" data-resort-name="${resort.name}" data-resort-price="${resort.price.toFixed(2)}" title="Edit">
                     <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger delete-resort-btn" data-resort-id="${resort.id}" title="Delete">

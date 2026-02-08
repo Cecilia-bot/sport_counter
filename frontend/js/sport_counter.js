@@ -14,7 +14,7 @@ async function loadResorts() {
     
     resorts.forEach(resort => {
         const option = document.createElement("option");
-        option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price} €`;
+        option.textContent = `${resort.name.charAt(0).toUpperCase() + resort.name.slice(1)} - ${resort.price.toFixed(2)} €`;
         option.value = `${resort.name}`;
         dropdown.appendChild(option);
     });
