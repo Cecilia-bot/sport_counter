@@ -235,3 +235,10 @@ footer a:hover {
     transform: translateY(100vh);
   }
 }
+
+/* Make privacy policy card scrollable */
+#card-privacy {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
