@@ -99,11 +99,17 @@ footer a:hover {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.4s ease, visibility 0.4s;
+
+    /* make it a solid button by default, not just outline */
+    background-color: #05276e;
+    color: white;
+    border: none;
 }
 
 #scrollTopBtn:hover {
     color: white;
     background-color: #05276e;
+    text-decoration: none; /* no underline when focused */
 }
 
 .back-arrow {
